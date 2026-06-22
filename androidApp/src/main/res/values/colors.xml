@@ -1,0 +1,5 @@
+<resources>
+    <!-- Default brand colors. Each store overrides these in androidApp/src/<store>/res/values/colors.xml -->
+    <color name="brand_primary">#6750A4</color>
+    <color name="brand_secondary">#625B71</color>
+</resources>

@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.isharaw.kmpproj.core.LocalBranding
 import com.isharaw.kmpproj.core.formatPrice
 import com.isharaw.kmpproj.feature.cart.CartItem
 import com.isharaw.kmpproj.feature.cart.CartRepository
@@ -33,6 +34,8 @@ fun CartScreen(repository: CartRepository) {
     fun refresh() { items = repository.items }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // Per-store wording, read ambiently — value comes from the active flavor's strings.xml.
+        Text(LocalBranding.current.welcome, style = MaterialTheme.typography.titleMedium)
         Text("Cart", style = MaterialTheme.typography.headlineSmall)
 
         if (items.isEmpty()) {

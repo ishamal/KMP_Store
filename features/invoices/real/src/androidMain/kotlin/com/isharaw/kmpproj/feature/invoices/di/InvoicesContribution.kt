@@ -3,7 +3,6 @@ package com.isharaw.kmpproj.feature.invoices.di
 import androidx.navigation3.runtime.NavKey
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.EntryProviderInstaller
-import com.isharaw.kmpproj.core.SessionManager
 import com.isharaw.kmpproj.core.Tab
 import com.isharaw.kmpproj.core.TabMeta
 import com.isharaw.kmpproj.feature.invoices.InvoiceRepository
@@ -15,18 +14,15 @@ import dev.zacsweers.metro.Provides
 
 data object InvoicesKey : NavKey
 
-/** Invoices screen + tab; the screen scopes its data by the current experience. */
+/** Invoices screen + tab; the screen reads the current experience from LocalExperience. */
 @ContributesTo(AppScope::class)
 @BindingContainer
 object InvoicesContribution {
     @Provides
     @IntoSet
-    fun invoicesEntry(repository: InvoiceRepository, sessionManager: SessionManager): EntryProviderInstaller = {
+    fun invoicesEntry(repository: InvoiceRepository): EntryProviderInstaller = {
         entry<InvoicesKey> {
-            InvoicesScreen(
-                repository = repository,
-                experience = sessionManager.session!!.experience,
-            )
+            InvoicesScreen(repository = repository)
         }
     }
 

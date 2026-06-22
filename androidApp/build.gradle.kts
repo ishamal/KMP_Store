@@ -59,6 +59,7 @@ dependencies {
     implementation(projects.core.di.api)
     implementation(projects.core.model.api)
     implementation(projects.core.navigation.api)
+    implementation(projects.core.ui.api)
     implementation(projects.core.session.api)
     // Links the SessionManager implementation into the app graph for every store.
     implementation(projects.core.session.real)

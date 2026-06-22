@@ -20,33 +20,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.isharaw.kmpproj.core.Capability
-import com.isharaw.kmpproj.core.CapabilityGated
-import com.isharaw.kmpproj.core.Experience
-import com.isharaw.kmpproj.core.allowedFor
+import com.isharaw.kmpproj.core.CapabilityGate
+import com.isharaw.kmpproj.core.LocalExperience
 import com.isharaw.kmpproj.core.formatPrice
 import com.isharaw.kmpproj.feature.invoices.Invoice
 import com.isharaw.kmpproj.feature.invoices.InvoiceRepository
 import com.isharaw.kmpproj.feature.invoices.InvoiceStatus
 import com.isharaw.kmpproj.feature.invoices.invoicesFor
 
-/** A toolbar action gated by a capability. Add a row to gate a new action — no extra `if`. */
-private data class InvoiceAction(
-    val label: String,
-    override val capability: Capability,
-    val onClick: () -> Unit,
-) : CapabilityGated
-
 @Composable
-fun InvoicesScreen(repository: InvoiceRepository, experience: Experience) {
+fun InvoicesScreen(repository: InvoiceRepository) {
+    // Experience is published globally by the app shell — read it ambiently, don't pass it around.
+    val experience = LocalExperience.current
     val invoices = remember(experience) { repository.invoicesFor(experience) }
-
-    // All toolbar actions declared once with the capability each needs; filtered generically.
-    val actions = remember(experience) {
-        listOf(
-            InvoiceAction("Export", Capability.EXPORT_INVOICES) { /* export */ },
-            // future actions go here — no new `if`
-        ).allowedFor(experience)
-    }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row(
@@ -55,10 +41,9 @@ fun InvoicesScreen(repository: InvoiceRepository, experience: Experience) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text("Invoices", style = MaterialTheme.typography.headlineSmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                actions.forEach { action ->
-                    TextButton(onClick = action.onClick) { Text(action.label) }
-                }
+            // Capability-gated, no `if` and no `experience` passed — the gate reads it ambiently.
+            CapabilityGate(Capability.EXPORT_INVOICES) {
+                TextButton(onClick = { /* export */ }) { Text("Export") }
             }
         }
 

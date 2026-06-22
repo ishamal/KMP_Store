@@ -2,6 +2,7 @@ package com.isharaw.kmpproj
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -11,10 +12,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.isharaw.kmpproj.core.Branding
 import com.isharaw.kmpproj.core.Experience
+import com.isharaw.kmpproj.core.LocalBranding
+import com.isharaw.kmpproj.core.LocalExperience
 import com.isharaw.kmpproj.core.LocalNavigator
 import com.isharaw.kmpproj.core.Navigator
 import com.isharaw.kmpproj.core.has
@@ -25,10 +31,24 @@ import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
 
 @Composable
 fun App() {
-    MaterialTheme {
+    // Per-store brand colors come from androidApp/src/<store>/res/values/colors.xml (flavor override).
+    // Applied here once, so every screen (incl. feature screens) picks up the active store's theme.
+    val brandColors = lightColorScheme(
+        primary = colorResource(R.color.brand_primary),
+        secondary = colorResource(R.color.brand_secondary),
+    )
+    // Per-store wordings from the active flavor's strings.xml, published for feature screens to read.
+    val branding = Branding(
+        appName = stringResource(R.string.app_name),
+        welcome = stringResource(R.string.welcome_message),
+    )
+    MaterialTheme(colorScheme = brandColors) {
         val graph = remember { createAppGraph() }
-        // Make Metro's VM factory available so any screen below can call metroViewModel().
-        CompositionLocalProvider(LocalMetroViewModelFactory provides graph.metroViewModelFactory) {
+        // Make Metro's VM factory + per-store branding available to any screen below.
+        CompositionLocalProvider(
+            LocalMetroViewModelFactory provides graph.metroViewModelFactory,
+            LocalBranding provides branding,
+        ) {
             // Observable session (RealSessionManager is Compose-backed): null → login, else → app.
             val session = graph.sessionManager.session
 
@@ -39,7 +59,10 @@ fun App() {
                     onLoginSuccess = { graph.sessionManager.session = it },
                 )
             } else {
-                MainScaffold(graph = graph, experience = session.experience)
+                // Publish the logged-in experience once; capability-aware UI reads it ambiently.
+                CompositionLocalProvider(LocalExperience provides session.experience) {
+                    MainScaffold(graph = graph, experience = session.experience)
+                }
             }
         }
     }
