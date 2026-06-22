@@ -1,0 +1,94 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="func-dist-1" name="Function Distribution">
+    <mxGraphModel dx="1100" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="1180" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Function Distribution Across Multiple Apps" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="20" width="460" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lblBuild" value="BUILD TIME — which functions ship in each app" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fontColor=#6C8EBF;" vertex="1" parent="1">
+          <mxGeometry x="250" y="60" width="400" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="codebase" value="ONE SHARED PLATFORM (Kotlin Multiplatform codebase)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="90" width="360" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="features" value="Functions as building blocks (independent modules):&#10;Login · Cart · Invoices · Orders · Rebates · Settings · Password Reset" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="220" y="170" width="460" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="manifest" value="STORE MANIFEST — selects which functions each app ships" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="260" width="360" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="storeA" value="Store A app&#10;&#10;Orders · Cart&#10;Invoices · Settings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="80" y="360" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="storeB" value="Store B app&#10;&#10;Cart · Settings&#10;Rebates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="350" y="360" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="storeC" value="Store C app&#10;&#10;Settings · Orders" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="620" y="360" width="200" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lblRun" value="RUN TIME — which functions THIS user sees (inside whichever app is installed)" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=2;fontColor=#9673A6;" vertex="1" parent="1">
+          <mxGeometry x="200" y="500" width="500" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="login" value="User logs in" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="350" y="530" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="experience" value="Experience identified&#10;(e.g. full access / restricted)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="350" y="600" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="capabilities" value="Capabilities catalog&#10;(what this user may do)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="350" y="680" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="functions" value="Functions shown / hidden for THIS user&#10;(tabs, buttons, data)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="760" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="codebase" target="features">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="features" target="manifest">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="manifest" target="storeA">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="manifest" target="storeB">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="manifest" target="storeC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="storeA" target="login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="storeB" target="login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="storeC" target="login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="login" target="experience">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="experience" target="capabilities">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="capabilities" target="functions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
