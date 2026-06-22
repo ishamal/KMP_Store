@@ -12,9 +12,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavKey
+import com.isharaw.kmpproj.branding.BrandColors
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.isharaw.kmpproj.core.Branding
@@ -31,11 +31,11 @@ import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
 
 @Composable
 fun App() {
-    // Per-store brand colors come from androidApp/src/<store>/res/values/colors.xml (flavor override).
-    // Applied here once, so every screen (incl. feature screens) picks up the active store's theme.
+    // Per-store brand colors come from androidApp/src/<store>/kotlin/.../BrandColors.kt (flavor
+    // source set). Applied once, so every screen (incl. feature screens) picks up the active theme.
     val brandColors = lightColorScheme(
-        primary = colorResource(R.color.brand_primary),
-        secondary = colorResource(R.color.brand_secondary),
+        primary = BrandColors.primary,
+        secondary = BrandColors.secondary,
     )
     // Per-store wordings from the active flavor's strings.xml, published for feature screens to read.
     val branding = Branding(

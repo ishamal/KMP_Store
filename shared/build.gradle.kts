@@ -6,9 +6,9 @@ plugins {
     alias(libs.plugins.metro)
 }
 
-// The active store (defaults to StoreManifest.DEFAULT_STORE) decides which feature modules
+// The active store (defaults to StoreManifest.SELECTED_STORE) decides which feature modules
 // the iOS framework links and exports. See buildSrc/StoreManifest.kt.
-val store = providers.gradleProperty("store").getOrElse(StoreManifest.DEFAULT_STORE)
+val store = providers.gradleProperty("store").getOrElse(StoreManifest.SELECTED_STORE)
 val storeFeatures = StoreManifest.featuresFor(store)
 
 kotlin {
