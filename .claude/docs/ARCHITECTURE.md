@@ -1,0 +1,4 @@
+entry:
+dirs:
+pattern:
+infra:
