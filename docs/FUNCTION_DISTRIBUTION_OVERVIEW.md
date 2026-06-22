@@ -182,36 +182,145 @@ The two-layer distribution above is delivered by **three technologies working to
 a single config in **`buildSrc`**, **Gradle** build-time wiring, and **Metro DI multibindings**
 (`@IntoSet` + `@Multibinds`).
 
-### 8.1 Single source of truth — `buildSrc/StoreManifest.kt`
-- `buildSrc` is a special Gradle module: it's compiled first and put on **every build script's
-  classpath automatically**, in type-safe Kotlin.
-- `StoreManifest` is one map — **store → list of functions** — that *both* the build configuration and
-  the packaging read. Change membership in **one place**, everywhere updates. No duplication.
+### 8.1 Single source of truth — one config file per store
+Each store is described by a tiny, human-readable config file in a common location
+`config/stores/<store>.properties`:
 
-### 8.2 Build-time distribution — Gradle flavors & per-flavor dependencies
-- Gradle generates a **product flavor per store** straight from `StoreManifest`.
-- For each flavor, **only that store's feature modules** are added as dependencies
-  (`add("${store}Implementation", project(":features:<f>:real"))`).
-- The shared (iOS) module **exports only the selected store's** `:api` modules.
-- **Net effect:** an app's binary physically contains *only its functions* — Store A's app doesn't even
-  include Store B's code.
+```properties
+# config/stores/storeA.properties
+applicationId=com.isharaw.kmpproj.storea
+features=login,cart,invoices,settings,orders,rebate,passwordReset
+```
+```properties
+# config/stores/storeB.properties
+applicationId=com.isharaw.kmpproj.storeb
+features=login,cart,settings,rebate
+```
+
+`StoreManifest` (in `buildSrc`, on every build script's classpath) simply reads these files and exposes
+the data to the build:
+
+```kotlin
+object StoreManifest {
+    const val SELECTED_STORE = "storeA"
+
+    // store -> the functions it ships (read from config/stores/<store>.properties)
+    val stores: Map<String, List<String>> get() = loadConfigs().mapValues { it.value.features }
+
+    fun featuresFor(store: String): List<String> = loadConfigs()[store]!!.features
+    fun applicationId(store: String): String = loadConfigs()[store]!!.applicationId
+}
+```
+
+**A store is a single config file.** Define a store's identity and the functions it ships in one place;
+everything else (the Android app, the iOS framework) reads from it. No code change to add or adjust a store.
+
+### 8.2 Build-time distribution — generated from the config
+Gradle generates a **product flavor per store** and links **only that store's functions**, straight
+from the config — no per-store build code:
+
+```kotlin
+// androidApp/build.gradle.kts  — flavors + dependencies are derived from the config
+productFlavors {
+    StoreManifest.stores.keys.forEach { store ->
+        create(store) { applicationId = StoreManifest.applicationId(store) }
+    }
+}
+
+dependencies {
+    StoreManifest.stores.forEach { (store, features) ->
+        features.forEach { feature ->
+            add("${store}Implementation", project(":features:$feature:real"))
+        }
+    }
+}
+```
+
+**Net effect:** each app's binary physically contains *only its functions*. You can prove it:
+```bash
+./gradlew :androidApp:dependencies --configuration storeBDebugRuntimeClasspath | grep features
+#  → only Store B's features (cart, settings, rebate). Store A's code is simply not there.
+```
+The iOS framework composes the same way from the same config, so Android and iOS stay in lock-step.
 
 ### 8.3 Self-registration & assembly — Metro `@IntoSet` + `@Multibinds`
-This is what lets the app **discover** its functions without a central wiring list:
-- Each feature **contributes itself** with `@Provides @IntoSet` (a screen installer, a bottom-bar tab, a
-  settings/feature action) inside a `@ContributesTo(scope)` container.
-- The app graph **declares the collectors**: `@Multibinds(allowEmpty = true) val tabs: Set<Tab>`,
-  `… entryInstallers: Set<EntryProviderInstaller>`, `… featureActions: Set<FeatureAction>`.
-- At compile time, **Metro gathers every `@IntoSet` contribution that's on the classpath** — i.e. the
-  modules the active flavor linked — into those sets.
-- The app simply **renders whatever is in the sets**. There is no master list to edit when a function is
-  added or removed.
-- **`@Multibinds(allowEmpty = true)` is the key enabler:** a store that ships *none* of a given function
-  type still gets a valid (empty) set — so omitting a function is a config change, not a code change.
+Each function **registers itself** — there's no central list of "what's in the app." A feature
+contributes itself into shared collections:
+
+```kotlin
+// features/orders/.../OrdersContribution.kt — the Orders function plugs itself in
+@ContributesTo(AppScope::class)
+@BindingContainer
+object OrdersContribution {
+    @Provides @IntoSet
+    fun ordersEntry(repo: OrderRepository): EntryProviderInstaller = { entry<OrdersKey> { OrdersScreen(repo) } }
+
+    @Provides @IntoSet
+    fun ordersTab(): Tab = Tab(OrdersKey, TabMeta("Orders", "📦", order = 20))
+}
+```
+
+The app graph just **declares the collectors** and the app renders whatever arrived:
+
+```kotlin
+// androidApp/.../AppGraph.kt
+@Multibinds(allowEmpty = true) val tabs: Set<Tab>
+@Multibinds(allowEmpty = true) val entryInstallers: Set<EntryProviderInstaller>
+@Multibinds(allowEmpty = true) val featureActions: Set<FeatureAction>
+```
+
+At compile time **Metro gathers every `@IntoSet` contribution on the classpath** — i.e. exactly the
+functions the active store linked — into those sets. The app renders the sets; there is **no master
+list to edit** when a function is added or removed. `@Multibinds(allowEmpty = true)` means a store that
+ships none of a given function type still gets a valid (empty) set — so omitting a function is a config
+change, never a code change.
 
 > 🔑 **Why `@Multibinds` matters here:** it is the "collection point." Build-time decides *which*
 > `@IntoSet` contributions exist on the classpath; `@Multibinds` is what assembles them into the set the
 > app consumes. Together they turn "which functions are in this app" into pure configuration.
+
+#### Anatomy of a `FeatureAction`
+A `FeatureAction` is how a function exposes an entry point into a shared host surface (e.g. the Settings
+screen). It is **pure data** — the function describes *what* it is and *where* it can appear; the host
+decides how to draw it.
+
+```kotlin
+class FeatureAction(
+    val label: String,            // text shown to the user
+    val target: NavKey,           // destination opened on click
+    val slots: Set<FeatureSlot>,  // which host surface(s) may render it
+    val kind: FeatureKind,        // which feature this is — host maps it to a look/placement
+    val order: Int = 0,           // sort order within a host (lower = first)
+)
+```
+
+| Field | Meaning | At runtime |
+|---|---|---|
+| `label` | text shown to the user | rendered as the button/card label |
+| `target` | the destination it opens | on click → navigate to `target` |
+| `slots` | host surface(s) it belongs to (a `Set`) | a host keeps only actions whose `slots` contain it; the `Set` lets one action appear in several surfaces |
+| `kind` | which feature it is | the host maps the kind to a concrete look/placement |
+| `order` | position among siblings | actions are sorted ascending |
+
+Supporting enums: **`FeatureSlot`** = *where* it can appear (e.g. `SETTINGS`); **`FeatureKind`** =
+*what* it is (e.g. `REBATE`, `PASSWORD_RESET`).
+
+The two real contributions:
+
+```kotlin
+// Rebate → shown in Settings, drawn as a card, sorted after order 0
+FeatureAction(label = "Rebates",        target = RebateKey,        slot = FeatureSlot.SETTINGS,
+              kind = FeatureKind.REBATE,         order = 10)
+
+// Password reset → shown in Settings, drawn as a button, sorted first
+FeatureAction(label = "Reset password", target = PasswordResetKey, slot = FeatureSlot.SETTINGS,
+              kind = FeatureKind.PASSWORD_RESET, order = 0)
+```
+
+How the host (Settings) uses these values: **filter** by `slots` → **sort** by `order` → **render** by
+`kind` (Rebate as a card, Password reset as a button), each showing its `label`; on tap →
+`navigator.goTo(target)`. A function controls its own presence and presentation entirely through this
+small data object — no edits in the host.
 
 ### 8.4 End-to-end flow
 
@@ -235,11 +344,55 @@ This is what lets the app **discover** its functions without a central wiring li
 ```
 
 ### 8.5 Why this design pays off
-- **One place to change membership** (`StoreManifest`); the **compiler enforces** it and **Metro
+- **One place to change membership** (the store config); the **compiler enforces** it and **Metro
   assembles** it — no manual per-app wiring, no drift.
 - **Adding a function or a store** touches *configuration*, not every app's code.
-- **`@Multibinds` + `@IntoSet`** make features true plug-ins: drop the module in (via the manifest) and
+- **`@Multibinds` + `@IntoSet`** make features true plug-ins: list the module in a store's config and
   it appears; remove it and it's gone — safely, because empty sets are allowed.
+
+### 8.6 Common *and* exclusive functions — one uniform mechanism
+Every function lives in exactly **one place** — an independent module under `features/` — and whether it
+is shared by many stores or exclusive to one is decided **purely by configuration**. There is nothing
+special to set up for an exclusive function; it's the same module, just listed in fewer stores.
+
+```properties
+# config/stores/storeA.properties
+features=login,cart,invoices,settings,orders,rebate,passwordReset
+
+# config/stores/storeB.properties
+features=login,cart,settings,rebate
+```
+
+Read straight off the config:
+- **`login`, `settings`** appear in every store → *common* functions.
+- **`invoices`, `orders`, `passwordReset`** appear in some stores → *partly shared*.
+- **`rebate`** could appear in just one store → *exclusive to that store* — yet it's the very same
+  `features/rebate` module, with the same structure as every other function.
+
+**"Common vs exclusive" is data, not structure.** The same module powers both cases; the only difference
+is how many store configs name it. This keeps every function uniform, reusable, and discoverable in one
+predictable location — and means an exclusive function needs **no special placement** to be exclusive.
+
+### 8.7 Adding or sharing a function — configuration, not code
+
+**Make an exclusive function shared** = add its name to another store's config. One line:
+```diff
+  # config/stores/storeA.properties
+- features=login,cart,invoices,settings,orders,passwordReset
++ features=login,cart,invoices,settings,orders,rebate,passwordReset
+```
+That single edit ships `rebate` to Store A too — the flavor links it, Metro registers it, both Android
+and iOS pick it up. No module moves, no rewiring.
+
+**Add a whole new store** = one command (scaffolds the config + branding), then build:
+```bash
+./scripts/new-store.sh storeD login,settings,orders
+./gradlew :androidApp:assembleStoreDDebug
+```
+
+**Add a brand-new function** = create one module under `features/<name>/{api,real}`, let it self-register
+(`@IntoSet`), and list it in the stores that should ship it. Every function — common or exclusive —
+follows this same path.
 
 ---
 
