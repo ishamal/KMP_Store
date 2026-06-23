@@ -40,10 +40,11 @@ fi
 
 mkdir -p "$BRAND_DIR" "$RES_DIR" "$(dirname "$CONFIG")"
 
-# 1) Common store config (read by buildSrc/StoreManifest.kt → drives Android flavor + iOS export)
+# 1) Common store config (read by buildSrc/StoreManifest.kt → drives Android flavor + iOS export).
+#    applicationId is derived by Gradle as StoreManifest.BASE_APPLICATION_ID + "." + storeName.
 cat > "$CONFIG" <<EOF
 # $STORE config — read at build time by buildSrc/StoreManifest.kt
-applicationId=$APP_ID
+storeName=$STORE
 features=$FEATURES
 EOF
 

@@ -22,10 +22,13 @@ object StoreManifest {
 
     const val SELECTED_STORE = "storeA"
 
+    /** Base package; each store's applicationId is derived as BASE_APPLICATION_ID + "." + store name. */
+    const val BASE_APPLICATION_ID = "com.isharaw.kmpproj"
+
     /** Common config dir holding one <store>.properties per store (resolved from the root project). */
     private val storesDir = File(System.getProperty("user.dir"), "config/stores")
 
-    private data class StoreConfig(val features: List<String>, val applicationId: String)
+    private data class StoreConfig(val storeName: String, val features: List<String>)
 
     // NOTE: read fresh on every access (no `by lazy`/cached val). `object StoreManifest` lives for the
     // whole Gradle daemon JVM, so a cached value would not pick up a newly added store.properties until
@@ -37,8 +40,12 @@ object StoreManifest {
     fun featuresFor(store: String): List<String> =
         loadConfigs()[store]?.features ?: error("Unknown store '$store'. Known stores: ${loadConfigs().keys}")
 
+    fun storeName(store: String): String =
+        loadConfigs()[store]?.storeName ?: error("Unknown store '$store'. Known stores: ${loadConfigs().keys}")
+
+    /** applicationId is derived: base package + the store name appended (lowercased). */
     fun applicationId(store: String): String =
-        loadConfigs()[store]?.applicationId ?: error("Unknown store '$store'. Known stores: ${loadConfigs().keys}")
+        "$BASE_APPLICATION_ID.${storeName(store).lowercase()}"
 
     private fun loadConfigs(): Map<String, StoreConfig> {
         val files = storesDir.listFiles { f -> f.isFile && f.extension == "properties" }
@@ -47,9 +54,10 @@ object StoreManifest {
             val props = Properties().apply { file.inputStream().use { load(it) } }
             val features = props.getProperty("features").orEmpty()
                 .split(",").map { it.trim() }.filter { it.isNotEmpty() }
-            val appId = props.getProperty("applicationId")
-                ?: error("Missing 'applicationId' in ${file.path}")
-            file.nameWithoutExtension to StoreConfig(features, appId)
+            // The store name drives the applicationId suffix; defaults to the file name if omitted.
+            val storeName = props.getProperty("storeName")?.trim()?.takeIf { it.isNotEmpty() }
+                ?: file.nameWithoutExtension
+            file.nameWithoutExtension to StoreConfig(storeName = storeName, features = features)
         }.sortedBy { it.first }
         check(found.isNotEmpty()) { "No <store>.properties files found under $storesDir" }
         return found.toMap()
