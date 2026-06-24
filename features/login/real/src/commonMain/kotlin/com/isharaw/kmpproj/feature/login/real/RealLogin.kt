@@ -3,6 +3,8 @@ package com.isharaw.kmpproj.feature.login.real
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.Experience
 import com.isharaw.kmpproj.core.Session
+import com.isharaw.kmpproj.core.access.BusinessUnit
+import com.isharaw.kmpproj.core.access.UserRole
 import com.isharaw.kmpproj.feature.login.Authenticator
 import com.isharaw.kmpproj.feature.login.LoginValidator
 import dev.zacsweers.metro.ContributesBinding
@@ -22,10 +24,32 @@ class RealLoginValidator : LoginValidator {
 @Inject
 @ContributesBinding(AppScope::class)
 class RealAuthenticator : Authenticator {
-    // STUB: derive experience from the email until a real backend is wired.
+    // STUB: derive the session identity from the email until a real backend is wired. The local part
+    // of the address (before "@") picks the business unit and role, e.g. "sesm.manager@x.com".
     override fun authenticate(email: String, password: String): Session {
-        val experience =
-            if (email.trim().startsWith("cabl", ignoreCase = true)) Experience.CABL else Experience.USBL
-        return Session(email = email.trim(), experience = experience)
+        val normalized = email.trim()
+        val key = normalized.substringBefore('@').lowercase()
+
+        val experience = if (key.startsWith("cabl")) Experience.CABL else Experience.USBL
+
+        val businessUnit = when {
+            key.startsWith("cabl") -> BusinessUnit.CABL
+            key.startsWith("sesm") -> BusinessUnit.SESM
+            else -> BusinessUnit.USBL
+        }
+
+        val userRole = when {
+            "custadmin" in key || "customer" in key -> UserRole.CUSTOMER_ADMIN
+            "admin" in key -> UserRole.ADMIN
+            "manager" in key -> UserRole.MANAGER
+            else -> UserRole.USER
+        }
+
+        return Session(
+            email = normalized,
+            experience = experience,
+            businessUnit = businessUnit,
+            userRole = userRole,
+        )
     }
 }

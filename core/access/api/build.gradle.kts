@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// :core:session:api — session contracts/types (Session, SessionManager). Exported to iOS. No Metro.
+// :core:access — access-control vocabulary + the AccessControl black-box contract:
+// BusinessUnit, UserRole, Capability, Permission, Feature, AccessKeys, AccessControl. No deps, no Compose.
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
@@ -11,7 +12,7 @@ kotlin {
     iosSimulatorArm64()
 
     androidLibrary {
-        namespace = "com.isharaw.kmpproj.core.session"
+        namespace = "com.isharaw.kmpproj.core.access"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -21,9 +22,8 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            api(project(":core:model:api"))  // Session references Experience
-            api(project(":core:access:api")) // Session references BusinessUnit / UserRole
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
     }
 }
