@@ -67,8 +67,17 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
+            // Each tab is compiled in only when this store ships the feature (STORE_HAS_* flags come
+            // from the flavor's xcconfig). The matching graph accessor is generated to match, so a
+            // store without a feature has neither the UI nor the property — mirrors the Android tabs.
+            #if STORE_HAS_CART
             CartView(repository: appGraph.cartRepository)
                 .tabItem { Label("Cart", systemImage: "cart") }
+            #endif
+            #if STORE_HAS_ORDERS
+            OrdersView(repository: appGraph.orderRepository)
+                .tabItem { Label("Orders", systemImage: "shippingbox") }
+            #endif
             #if STORE_HAS_INVOICES
             InvoicesView(repository: appGraph.invoiceRepository)
                 .tabItem { Label("Invoices", systemImage: "doc.text") }
@@ -79,8 +88,9 @@ struct MainTabView: View {
     }
 }
 
-// MARK: - Cart
+// MARK: - Cart (storeA + storeB)
 
+#if STORE_HAS_CART
 struct CartView: View {
     let repository: CartRepository
     @State private var items: [CartItem] = []
@@ -125,6 +135,7 @@ struct CartView: View {
 
     private func refresh() { items = repository.items }
 }
+#endif
 
 // MARK: - Invoices (storeA only)
 
@@ -164,6 +175,48 @@ private func statusColor(_ status: InvoiceStatus) -> Color {
     if status == InvoiceStatus.paid { return .green }
     if status == InvoiceStatus.pending { return .orange }
     return .red
+}
+#endif
+
+// MARK: - Orders (storeA + storeC)
+
+#if STORE_HAS_ORDERS
+struct OrdersView: View {
+    let repository: OrderRepository
+
+    var body: some View {
+        NavigationView {
+            List(repository.all(), id: \.number) { order in
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(order.number).fontWeight(.medium)
+                        Text("\(order.itemCount) items · \(order.date)")
+                            .font(.caption).foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing) {
+                        Text(formatPrice(order.total)).fontWeight(.bold)
+                        Text(orderStatusLabel(order.status))
+                            .font(.caption)
+                            .foregroundColor(orderStatusColor(order.status))
+                    }
+                }
+            }
+            .navigationTitle("Orders")
+        }
+    }
+}
+
+private func orderStatusLabel(_ status: OrderStatus) -> String {
+    if status == OrderStatus.processing { return "Processing" }
+    if status == OrderStatus.shipped { return "Shipped" }
+    return "Delivered"
+}
+
+private func orderStatusColor(_ status: OrderStatus) -> Color {
+    if status == OrderStatus.processing { return .orange }
+    if status == OrderStatus.shipped { return .blue }
+    return .green
 }
 #endif
 

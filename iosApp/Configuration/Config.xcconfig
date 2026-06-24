@@ -9,5 +9,5 @@ MARKETING_VERSION=1.0
 
 // Drives the Kotlin framework build phase (-Pstore=$GRADLE_STORE).
 GRADLE_STORE=storeA
-// Compiles the Swift invoices code in this store.
-SWIFT_ACTIVE_COMPILATION_CONDITIONS=STORE_HAS_INVOICES
+// Per-feature flags: compile the Swift UI for the features storeA ships (cart, invoices, orders).
+SWIFT_ACTIVE_COMPILATION_CONDITIONS=STORE_HAS_CART STORE_HAS_INVOICES STORE_HAS_ORDERS

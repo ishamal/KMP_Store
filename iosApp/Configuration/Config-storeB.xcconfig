@@ -1,4 +1,4 @@
-// storeB configuration (no Invoices feature).
+// storeB configuration (login, cart, settings, rebate — no Invoices/Orders).
 TEAM_ID=
 
 PRODUCT_NAME=KmpProj
@@ -9,5 +9,5 @@ MARKETING_VERSION=1.0
 
 // Drives the Kotlin framework build phase (-Pstore=$GRADLE_STORE).
 GRADLE_STORE=storeB
-// No STORE_HAS_INVOICES flag -> invoices code is excluded from compilation.
-SWIFT_ACTIVE_COMPILATION_CONDITIONS=
+// storeB ships cart only (of the flagged features); invoices/orders code is excluded.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS=STORE_HAS_CART

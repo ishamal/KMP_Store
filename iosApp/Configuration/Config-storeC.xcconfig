@@ -1,0 +1,13 @@
+// storeC configuration (login, settings, orders — no Invoices feature).
+TEAM_ID=
+
+PRODUCT_NAME=KmpProj
+PRODUCT_BUNDLE_IDENTIFIER=com.isharaw.kmpproj.storec
+
+CURRENT_PROJECT_VERSION=1
+MARKETING_VERSION=1.0
+
+// Drives the Kotlin framework build phase (-Pstore=$GRADLE_STORE).
+GRADLE_STORE=storeC
+// storeC ships orders (of the flagged features); cart/invoices code is excluded.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS=STORE_HAS_ORDERS

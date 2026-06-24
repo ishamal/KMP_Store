@@ -8,6 +8,7 @@ New here? Start with the architecture overview, then the topic guides:
   (incl. how to set up this store/feature system in a new project)
 - [docs/STORES_AND_FEATURES.md](./docs/STORES_AND_FEATURES.md) — the store/feature design
 - [docs/ADDING_STORES_AND_FEATURES.md](./docs/ADDING_STORES_AND_FEATURES.md) — how-to with steps
+- [docs/IOS_STORE_FLAVORS.md](./docs/IOS_STORE_FLAVORS.md) — building per-store iOS flavors that compile only needed features (beginner-friendly)
 - [docs/METRO_DI.md](./docs/METRO_DI.md) — how dependency injection (Metro) works, for beginners
 - [docs/DI_CONVENTIONS.md](./docs/DI_CONVENTIONS.md) — api/real module split + Metro conventions
 - [docs/EXPERIENCES.md](./docs/EXPERIENCES.md) — per-user (USBL/CABL) runtime behaviour
