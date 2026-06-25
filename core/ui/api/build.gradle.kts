@@ -26,6 +26,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             api(project(":core:model:api"))     // Capability, Experience, has()
+            api(project(":core:access:api"))    // AccessControl, Feature, Capability, Permission
             implementation(libs.compose.runtime)
         }
     }

@@ -23,6 +23,8 @@ import com.isharaw.kmpproj.core.LocalBranding
 import com.isharaw.kmpproj.core.LocalExperience
 import com.isharaw.kmpproj.core.LocalNavigator
 import com.isharaw.kmpproj.core.Navigator
+import com.isharaw.kmpproj.core.access.ui.AccessGuard
+import com.isharaw.kmpproj.core.access.ui.LocalAccessGuard
 import com.isharaw.kmpproj.core.has
 import com.isharaw.kmpproj.di.AppGraph
 import com.isharaw.kmpproj.di.createAppGraph
@@ -59,8 +61,16 @@ fun App() {
                     onLoginSuccess = { graph.sessionManager.session = it },
                 )
             } else {
-                // Publish the logged-in experience once; capability-aware UI reads it ambiently.
-                CompositionLocalProvider(LocalExperience provides session.experience) {
+                // Publish the logged-in experience + the access guard (business unit + role) once;
+                // UI reads them ambiently. Permissions are checked in the UI via PermissionGate.
+                CompositionLocalProvider(
+                    LocalExperience provides session.experience,
+                    LocalAccessGuard provides AccessGuard(
+                        accessControl = graph.accessControl,
+                        businessUnit = session.businessUnit,
+                        userRole = session.userRole,
+                    ),
+                ) {
                     MainScaffold(graph = graph, experience = session.experience)
                 }
             }
