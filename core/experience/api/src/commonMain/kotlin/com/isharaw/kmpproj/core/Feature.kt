@@ -1,7 +1,26 @@
 package com.isharaw.kmpproj.core
 
-/** Stable identity of a top-level app feature — used for tab gating and equality. */
-enum class FeatureId { CART, CATALOG, INVOICES, ORDERS, REBATE, SETTINGS }
+/**
+ * Stable identity of a top-level app feature — used for tab gating and equality. [key] is the prefix
+ * of its capabilities (e.g. ORDERS → `"order"`, so `"order.create"` belongs to ORDERS).
+ */
+enum class FeatureId(val key: String, val displayName: String) {
+    CART("cart", "Cart"),
+    CATALOG("catalog", "Catalog"),
+    INVOICES("invoice", "Invoices"),
+    ORDERS("order", "Orders"),
+    REBATE("rebate", "Rebate"),
+    SETTINGS("settings", "Settings"),
+    ;
+
+    companion object {
+        /** The feature a dotted capability belongs to, by its prefix; `"cart.view"` → [CART]. */
+        fun fromCapability(capability: String): FeatureId? {
+            val prefix = capability.substringBefore('.').trim()
+            return entries.firstOrNull { it.key == prefix }
+        }
+    }
+}
 
 /**
  * A feature the backend **resolved** for a user: its [featureId], a display [featureName], and the

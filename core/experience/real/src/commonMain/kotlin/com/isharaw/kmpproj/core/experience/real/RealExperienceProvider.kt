@@ -40,41 +40,21 @@ class RealExperienceProvider(
         capability in capabilitiesOf(featureId)
 
     /**
-     * Resolves a snapshot from the given inputs using **sample data** (stands in for the backend):
-     * the [businessUnit] decides which features are available, and the [userRoles] role trims the
-     * capabilities (a plain USER gets view-only).
+     * Builds the snapshot for a login by **deriving features from the [capabilities] list**: each
+     * capability's prefix names its feature (`"cart.view"` ⇒ CART), so we group the capabilities by
+     * [FeatureId] and build one [Feature] per group. Capabilities the app doesn't recognise are ignored.
      */
     override fun getExperienceSnapshot(
         experience: Experience,
         businessUnit: BusinessUnit,
         userRoles: UserRole,
+        capabilities: Set<String>,
     ): ExperienceSnapshot {
-        // Full feature catalog (id + display name + all capabilities).
-        val catalog = listOf(
-            Feature(FeatureId.CART, "Cart", setOf("cart.view", "cart.add", "cart.remove", "cart.checkout")),
-            Feature(FeatureId.CATALOG, "Catalog", setOf("catalog.view")),
-            Feature(FeatureId.INVOICES, "Invoices", setOf("invoice.view", "invoice.export")),
-            Feature(FeatureId.ORDERS, "Orders", setOf("order.view", "order.create", "order.update", "order.cancel")),
-            Feature(FeatureId.REBATE, "Rebate", setOf("rebate.view")),
-            Feature(FeatureId.SETTINGS, "Settings", setOf("settings.view", "settings.edit")),
-        )
-
-        // Which features the business unit makes available (SETTINGS always, so there's a tab).
-        val allowedIds = when (businessUnit) {
-            BusinessUnit.USBL -> FeatureId.entries.toSet() // full
-            BusinessUnit.CABL -> setOf(FeatureId.CART, FeatureId.INVOICES, FeatureId.SETTINGS)
-            BusinessUnit.SENM -> setOf(FeatureId.CART, FeatureId.ORDERS, FeatureId.REBATE, FeatureId.CATALOG, FeatureId.SETTINGS)
-        }
-
-        // The role trims capabilities: a plain USER only gets the read (".view") actions.
-        fun capabilitiesFor(feature: Feature): Set<String> = when (userRoles) {
-            UserRole.USER -> feature.capabilities.filterTo(mutableSetOf()) { it.endsWith(".view") }
-            else -> feature.capabilities
-        }
-
-        val resolvedFeatures = catalog
-            .filter { it.featureId in allowedIds }
-            .mapTo(mutableSetOf()) { it.copy(capabilities = capabilitiesFor(it)) }
+        val resolvedFeatures = capabilities
+            .groupBy { FeatureId.fromCapability(it) }
+            .mapNotNullTo(mutableSetOf()) { (featureId, caps) ->
+                featureId?.let { Feature(it, it.displayName, caps.toSet()) }
+            }
 
         return ExperienceSnapshot(
             experience = experience,

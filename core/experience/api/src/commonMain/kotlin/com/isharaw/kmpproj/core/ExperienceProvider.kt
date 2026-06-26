@@ -22,9 +22,16 @@ interface ExperienceProvider {
     /** True if the current experience grants [capability] within [featureId] (e.g. "order.create"). */
     fun hasCapability(featureId: FeatureId, capability: String): Boolean
 
+    /**
+     * Builds an [ExperienceSnapshot] for a successful login. [experience] is known from app start;
+     * [businessUnit], [userRoles] and the flat [capabilities] list (e.g. `["cart.view","order.create"]`)
+     * come from the login. Features are **derived from the capabilities**: a capability's prefix names
+     * its feature (`"cart.view"` ⇒ the CART feature exists, with that capability).
+     */
     fun getExperienceSnapshot(
         experience: Experience,
         businessUnit: BusinessUnit,
-        userRoles: UserRole
-    ) : ExperienceSnapshot
- }
+        userRoles: UserRole,
+        capabilities: Set<String>,
+    ): ExperienceSnapshot
+}

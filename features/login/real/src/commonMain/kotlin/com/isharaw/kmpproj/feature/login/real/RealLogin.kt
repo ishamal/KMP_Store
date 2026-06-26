@@ -1,13 +1,8 @@
 package com.isharaw.kmpproj.feature.login.real
 
 import com.isharaw.kmpproj.core.AppScope
-import com.isharaw.kmpproj.core.BusinessUnit
-import com.isharaw.kmpproj.core.Experience
-import com.isharaw.kmpproj.core.ExperienceSnapshot
-import com.isharaw.kmpproj.core.Feature
-import com.isharaw.kmpproj.core.FeatureId
+import com.isharaw.kmpproj.core.ExperienceProvider
 import com.isharaw.kmpproj.core.Session
-import com.isharaw.kmpproj.core.UserRole
 import com.isharaw.kmpproj.feature.login.Authenticator
 import com.isharaw.kmpproj.feature.login.LoginValidator
 import dev.zacsweers.metro.ContributesBinding
@@ -26,57 +21,25 @@ class RealLoginValidator : LoginValidator {
 
 @Inject
 @ContributesBinding(AppScope::class)
-class RealAuthenticator : Authenticator {
-    // STUB: the backend will resolve the ExperienceSnapshot. Until then we derive it from the email's
-    // local part, e.g. "cargills.cabl.admin@x.com".
+class RealAuthenticator(
+    private val experienceProvider: ExperienceProvider,
+) : Authenticator {
+
+    // A successful login yields the business unit, role and capability list ([StubLoginData] stands in
+    // for the backend). We build the snapshot via getExperienceSnapshot, which derives the features
+    // from those capabilities (e.g. "cart.view" ⇒ the Cart feature).
     override fun authenticate(email: String, password: String): Session {
         val key = email.trim().substringBefore('@').lowercase()
+        val businessUnit = StubLoginData.businessUnitFor(key)
+        val userRole = StubLoginData.userRoleFor(key)
+        val capabilities = StubLoginData.capabilitiesFor(businessUnit)
 
-        val experience = when {
-            "cargills" in key -> Experience.CARGILLS
-            "glomark" in key -> Experience.GLOMARK
-            else -> Experience.KEELS
-        }
-
-        val businessUnit = when {
-            "cabl" in key -> BusinessUnit.CABL
-            "senm" in key -> BusinessUnit.SENM
-            else -> BusinessUnit.USBL
-        }
-
-        val userRole = when {
-            "custadmin" in key || "customer" in key -> UserRole.CUSTOMER_ADMIN
-            "admin" in key -> UserRole.ADMIN
-            "manager" in key -> UserRole.MANAGER
-            else -> UserRole.USER
-        }
-
-        // The full feature catalog (id + name + capabilities) the "backend" knows about.
-        val catalog = listOf(
-            Feature(FeatureId.CART, "Cart", setOf("cart.view", "cart.add", "cart.remove", "cart.checkout")),
-            Feature(FeatureId.CATALOG, "Catalog", setOf("catalog.view")),
-            Feature(FeatureId.INVOICES, "Invoices", setOf("invoice.view", "invoice.export")),
-            Feature(FeatureId.ORDERS, "Orders", setOf("order.view", "order.create", "order.update", "order.cancel")),
-            Feature(FeatureId.REBATE, "Rebate", setOf("rebate.view")),
-            Feature(FeatureId.SETTINGS, "Settings", setOf("settings.view", "settings.edit")),
+        val snapshot = experienceProvider.getExperienceSnapshot(
+            experience = StubLoginData.experience,
+            businessUnit = businessUnit,
+            userRoles = userRole,
+            capabilities = capabilities,
         )
-
-        // What the "backend" resolved as available. SETTINGS is always granted so there's always a tab.
-        val allowedIds = when (businessUnit) {
-            BusinessUnit.USBL -> FeatureId.entries.toSet() // full
-            BusinessUnit.CABL -> setOf(FeatureId.CART, FeatureId.INVOICES, FeatureId.SETTINGS)
-            BusinessUnit.SENM -> setOf(FeatureId.CART, FeatureId.ORDERS, FeatureId.REBATE, FeatureId.CATALOG, FeatureId.SETTINGS)
-        }
-        val resolvedFeatures = catalog.filter { it.featureId in allowedIds }.toSet()
-
-        return Session(
-            email = email.trim(),
-            snapshot = ExperienceSnapshot(
-                experience = experience,
-                businessUnit = businessUnit,
-                userRoles = userRole,
-                resolvedFeatures = resolvedFeatures,
-            ),
-        )
+        return Session(email = email.trim(), snapshot = snapshot)
     }
 }
