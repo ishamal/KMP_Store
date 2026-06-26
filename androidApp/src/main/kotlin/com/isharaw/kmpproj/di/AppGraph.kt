@@ -2,6 +2,7 @@ package com.isharaw.kmpproj.di
 
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.EntryProviderInstaller
+import com.isharaw.kmpproj.core.ExperienceProvider
 import com.isharaw.kmpproj.core.FeatureAction
 import com.isharaw.kmpproj.core.SessionManager
 import com.isharaw.kmpproj.core.Tab
@@ -35,6 +36,10 @@ interface AppGraph : ViewModelGraph {
     val loginValidator: LoginValidator
     val authenticator: Authenticator
     val sessionManager: SessionManager
+    val experienceProvider: ExperienceProvider
+
+    // Builds the customer (logged-in) child graph; the app shell creates one after login, drops on logout.
+    val customerGraphFactory: CustomerGraph.Factory
 }
 
 fun createAppGraph(): AppGraph = createGraph<AppGraph>()

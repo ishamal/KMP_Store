@@ -67,6 +67,8 @@ dependencies {
     implementation(projects.core.session.api)
     // Links the SessionManager implementation into the app graph for every store.
     implementation(projects.core.session.real)
+    // ExperienceProvider binding (reads the resolved snapshot off the session).
+    implementation(projects.core.experience.real)
 
     implementation(libs.androidx.activity.compose)
 

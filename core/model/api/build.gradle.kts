@@ -1,7 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// :core:model — pure domain types shared by every feature and by iOS:
-// Experience, Session, Capability/ExperienceCatalog, SessionManager, TabMeta. No deps, no Compose.
+// :core:model — pure domain types (TabMeta, …) shared by every feature and by iOS. The access
+// snapshot model (Experience/BusinessUnit/UserRole/Feature/ExperienceSnapshot) lives in
+// :core:experience:api, re-exported here so existing consumers keep getting it. No Compose.
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
@@ -22,6 +23,9 @@ kotlin {
     }
 
     sourceSets {
+        commonMain.dependencies {
+            api(project(":core:experience:api")) // TabMeta.feature: Feature; re-export the snapshot model
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }

@@ -19,20 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.isharaw.kmpproj.core.Capability
-import com.isharaw.kmpproj.core.CapabilityGate
-import com.isharaw.kmpproj.core.LocalExperience
 import com.isharaw.kmpproj.core.formatPrice
 import com.isharaw.kmpproj.feature.invoices.Invoice
 import com.isharaw.kmpproj.feature.invoices.InvoiceRepository
 import com.isharaw.kmpproj.feature.invoices.InvoiceStatus
-import com.isharaw.kmpproj.feature.invoices.invoicesFor
 
 @Composable
 fun InvoicesScreen(repository: InvoiceRepository) {
-    // Experience is published globally by the app shell — read it ambiently, don't pass it around.
-    val experience = LocalExperience.current
-    val invoices = remember(experience) { repository.invoicesFor(experience) }
+    val invoices = remember { repository.all() }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row(
@@ -41,10 +35,7 @@ fun InvoicesScreen(repository: InvoiceRepository) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text("Invoices", style = MaterialTheme.typography.headlineSmall)
-            // Capability-gated, no `if` and no `experience` passed — the gate reads it ambiently.
-            CapabilityGate(Capability.EXPORT_INVOICES) {
-                TextButton(onClick = { /* export */ }) { Text("Export") }
-            }
+            TextButton(onClick = { /* export */ }) { Text("Export") }
         }
 
         LazyColumn(

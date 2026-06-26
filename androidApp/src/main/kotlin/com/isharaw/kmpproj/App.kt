@@ -18,12 +18,10 @@ import com.isharaw.kmpproj.branding.BrandColors
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.isharaw.kmpproj.core.Branding
-import com.isharaw.kmpproj.core.Experience
+import com.isharaw.kmpproj.core.ExperienceSnapshot
 import com.isharaw.kmpproj.core.LocalBranding
-import com.isharaw.kmpproj.core.LocalExperience
 import com.isharaw.kmpproj.core.LocalNavigator
 import com.isharaw.kmpproj.core.Navigator
-import com.isharaw.kmpproj.core.has
 import com.isharaw.kmpproj.di.AppGraph
 import com.isharaw.kmpproj.di.createAppGraph
 import com.isharaw.kmpproj.feature.login.ui.LoginScreen
@@ -59,24 +57,28 @@ fun App() {
                     onLoginSuccess = { graph.sessionManager.session = it },
                 )
             } else {
-                // Publish the logged-in experience once; capability-aware UI reads it ambiently.
-                CompositionLocalProvider(LocalExperience provides session.experience) {
-                    MainScaffold(graph = graph, experience = session.experience)
+                // CustomerScope starts here: build the customer child graph for this login. Keyed on
+                // `session`, so logout (session → null) leaves this branch and drops the graph — ending
+                // the scope; the next login builds a fresh one.
+                val customerGraph = remember(session) {
+                    graph.customerGraphFactory.create(session.snapshot)
                 }
+                MainScaffold(graph = graph, snapshot = customerGraph.snapshot)
             }
         }
     }
 }
 
 @Composable
-private fun MainScaffold(graph: AppGraph, experience: Experience) {
-    // Tabs come from whatever features the flavor linked; ordered + capability-filtered.
-    val tabs = remember(experience) {
+private fun MainScaffold(graph: AppGraph, snapshot: ExperienceSnapshot) {
+    // Tabs come from whatever features the flavor linked; ordered + filtered by the backend-resolved
+    // features (a tab with no feature is always shown).
+    val tabs = remember(snapshot) {
         graph.tabs
             .sortedBy { it.meta.order }
             .filter { tab ->
-                val cap = tab.meta.requiredCapability
-                cap == null || experience.has(cap)
+                val id = tab.meta.featureId
+                id == null || snapshot.resolvedFeatures.any { it.featureId == id }
             }
     }
     val backStack = remember(tabs) { mutableStateListOf<NavKey>(tabs.first().key) }

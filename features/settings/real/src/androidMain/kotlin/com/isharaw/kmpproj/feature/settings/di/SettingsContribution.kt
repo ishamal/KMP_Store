@@ -3,6 +3,7 @@ package com.isharaw.kmpproj.feature.settings.di
 import androidx.navigation3.runtime.NavKey
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.EntryProviderInstaller
+import com.isharaw.kmpproj.core.FeatureId
 import com.isharaw.kmpproj.core.FeatureAction
 import com.isharaw.kmpproj.core.FeatureSlot
 import com.isharaw.kmpproj.core.SessionManager
@@ -42,5 +43,5 @@ object SettingsContribution {
 
     @Provides
     @IntoSet
-    fun settingsTab(): Tab = Tab(SettingsKey, TabMeta("Settings", "⚙️", order = 100))
+    fun settingsTab(): Tab = Tab(SettingsKey, TabMeta("Settings", "⚙️", order = 100, featureId = FeatureId.SETTINGS))
 }

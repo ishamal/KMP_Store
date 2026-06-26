@@ -2,8 +2,8 @@ package com.isharaw.kmpproj.feature.orders.di
 
 import androidx.navigation3.runtime.NavKey
 import com.isharaw.kmpproj.core.AppScope
-import com.isharaw.kmpproj.core.Capability
 import com.isharaw.kmpproj.core.EntryProviderInstaller
+import com.isharaw.kmpproj.core.FeatureId
 import com.isharaw.kmpproj.core.Tab
 import com.isharaw.kmpproj.core.TabMeta
 import com.isharaw.kmpproj.feature.orders.OrderRepository
@@ -15,7 +15,7 @@ import dev.zacsweers.metro.Provides
 
 data object OrdersKey : NavKey
 
-/** Orders screen + tab (the tab is visible only to experiences with VIEW_ORDERS). */
+/** Orders screen + tab (the tab is visible only when ORDERS is in the user's resolved features). */
 @ContributesTo(AppScope::class)
 @BindingContainer
 object OrdersContribution {
@@ -28,5 +28,5 @@ object OrdersContribution {
     @Provides
     @IntoSet
     fun ordersTab(): Tab =
-        Tab(OrdersKey, TabMeta("Orders", "📦", order = 20, requiredCapability = Capability.VIEW_ORDERS))
+        Tab(OrdersKey, TabMeta("Orders", "📦", order = 20, featureId = FeatureId.ORDERS))
 }

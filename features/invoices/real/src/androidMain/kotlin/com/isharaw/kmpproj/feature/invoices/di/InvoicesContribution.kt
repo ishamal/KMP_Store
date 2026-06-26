@@ -3,6 +3,7 @@ package com.isharaw.kmpproj.feature.invoices.di
 import androidx.navigation3.runtime.NavKey
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.EntryProviderInstaller
+import com.isharaw.kmpproj.core.FeatureId
 import com.isharaw.kmpproj.core.Tab
 import com.isharaw.kmpproj.core.TabMeta
 import com.isharaw.kmpproj.feature.invoices.InvoiceRepository
@@ -14,7 +15,7 @@ import dev.zacsweers.metro.Provides
 
 data object InvoicesKey : NavKey
 
-/** Invoices screen + tab; the screen reads the current experience from LocalExperience. */
+/** Invoices screen + tab (gated by the INVOICES resolved feature). */
 @ContributesTo(AppScope::class)
 @BindingContainer
 object InvoicesContribution {
@@ -28,5 +29,5 @@ object InvoicesContribution {
 
     @Provides
     @IntoSet
-    fun invoicesTab(): Tab = Tab(InvoicesKey, TabMeta("Invoices", "🧾", order = 30))
+    fun invoicesTab(): Tab = Tab(InvoicesKey, TabMeta("Invoices", "🧾", order = 30, featureId = FeatureId.INVOICES))
 }
