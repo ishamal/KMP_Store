@@ -27,8 +27,6 @@ kotlin {
         commonMain.dependencies {
             api(project(":features:cart:api"))
             implementation(project(":core:di:api"))
-            implementation(project(":core:access:api"))  // AccessControl, Capability, requireCapability
-            implementation(project(":core:session:api")) // SessionManager (current business unit)
             implementation(project(":core:navigation:api"))
             implementation(project(":core:ui:api"))
             implementation(libs.compose.runtime)

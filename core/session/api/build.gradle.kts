@@ -22,8 +22,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":core:model:api"))  // Session references Experience
-            api(project(":core:access:api")) // Session references BusinessUnit / UserRole
+            api(project(":core:model:api")) // Session references Experience
         }
     }
 }

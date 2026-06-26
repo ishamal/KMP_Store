@@ -67,9 +67,6 @@ dependencies {
     implementation(projects.core.session.api)
     // Links the SessionManager implementation into the app graph for every store.
     implementation(projects.core.session.real)
-    // Access control: the AccessControl contract + its policy binding (RealAccessControl) for the graph.
-    implementation(projects.core.access.api)
-    implementation(projects.core.access.real)
 
     implementation(libs.androidx.activity.compose)
 
@@ -89,6 +86,7 @@ dependencies {
     // Metro ViewModel integration (graph builds the VM factory; screens use metroViewModel()).
     implementation(libs.metrox.viewmodel)
     implementation(libs.metrox.viewmodel.compose)
+
 
     // Each flavor pulls in exactly the feature :real modules its store declares (:api is transitive).
     StoreManifest.stores(storeRoot).forEach { (store, features) ->

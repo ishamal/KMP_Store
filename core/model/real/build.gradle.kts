@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 // :core:model:real — no implementation today (model is pure types). Exists to mirror the feature
-// api/real convention; bundles :core:model:api. (Access control moved to :core:access:real.)
+// api/real convention; bundles :core:model:api.
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)

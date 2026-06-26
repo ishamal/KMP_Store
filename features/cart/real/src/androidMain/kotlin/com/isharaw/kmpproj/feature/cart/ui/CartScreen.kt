@@ -24,8 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.isharaw.kmpproj.core.LocalBranding
-import com.isharaw.kmpproj.core.access.Permission
-import com.isharaw.kmpproj.core.access.ui.PermissionGate
 import com.isharaw.kmpproj.core.formatPrice
 import com.isharaw.kmpproj.feature.cart.CartItem
 import com.isharaw.kmpproj.feature.cart.CartRepository
@@ -90,21 +88,17 @@ private fun CartRow(
                 Text(item.name, fontWeight = FontWeight.Medium)
                 Text(formatPrice(item.lineTotal))
             }
-            // UI-level permission check: only roles granted the CART_EDIT permission see the edit
-            // controls. (The business-unit capability is enforced separately in RealCartRepository.)
-            PermissionGate(Permission.CART_EDIT) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedButton(onClick = onDecrement) { Text("-") }
-                        Text(item.quantity.toString(), modifier = Modifier.padding(horizontal = 16.dp))
-                        OutlinedButton(onClick = onIncrement) { Text("+") }
-                    }
-                    TextButton(onClick = onRemove) { Text("Remove") }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(onClick = onDecrement) { Text("-") }
+                    Text(item.quantity.toString(), modifier = Modifier.padding(horizontal = 16.dp))
+                    OutlinedButton(onClick = onIncrement) { Text("+") }
                 }
+                TextButton(onClick = onRemove) { Text("Remove") }
             }
         }
     }

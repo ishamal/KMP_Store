@@ -28,7 +28,6 @@ kotlin {
             api(project(":features:login:api"))
             implementation(project(":core:di:api"))
             implementation(project(":core:model:api"))
-            implementation(project(":core:access:api")) // BusinessUnit / UserRole
             implementation(project(":core:session:api"))
             implementation(libs.compose.runtime)
         }
