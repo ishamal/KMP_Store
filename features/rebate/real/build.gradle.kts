@@ -27,6 +27,8 @@ kotlin {
         commonMain.dependencies {
             api(project(":features:rebate:api"))
             implementation(project(":core:di:api"))
+            implementation(project(":core:access:api"))  // AccessControl, Capability (REBATE_VIEW)
+            implementation(project(":core:session:api")) // SessionManager (logout clears the session)
             implementation(project(":core:navigation:api"))
             implementation(project(":core:ui:api"))
             implementation(libs.compose.runtime)

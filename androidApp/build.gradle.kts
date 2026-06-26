@@ -13,6 +13,10 @@ kotlin {
     }
 }
 
+// Hoisted so StoreManifest resolves config/stores from the Gradle root (not user.dir), and so it's
+// unambiguous inside the android { } / dependencies { } blocks.
+val storeRoot = rootDir
+
 android {
     namespace = "com.isharaw.kmpproj"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -30,10 +34,10 @@ android {
     // Each store ships only the feature modules listed for it in the manifest.
     flavorDimensions += "store"
     productFlavors {
-        StoreManifest.stores.keys.forEach { store ->
+        StoreManifest.stores(storeRoot).keys.forEach { store ->
             create(store) {
                 dimension = "store"
-                applicationId = StoreManifest.applicationId(store)
+                applicationId = StoreManifest.applicationId(storeRoot, store)
             }
         }
     }
@@ -87,7 +91,7 @@ dependencies {
     implementation(libs.metrox.viewmodel.compose)
 
     // Each flavor pulls in exactly the feature :real modules its store declares (:api is transitive).
-    StoreManifest.stores.forEach { (store, features) ->
+    StoreManifest.stores(storeRoot).forEach { (store, features) ->
         features.forEach { feature ->
             add("${store}Implementation", project(":features:$feature:real"))
         }

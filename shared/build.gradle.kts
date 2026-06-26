@@ -9,7 +9,7 @@ plugins {
 // The active store (defaults to StoreManifest.SELECTED_STORE) decides which feature modules
 // the iOS framework links and exports. See buildSrc/StoreManifest.kt.
 val store = providers.gradleProperty("store").getOrElse(StoreManifest.SELECTED_STORE)
-val storeFeatures = StoreManifest.featuresFor(store)
+val storeFeatures = StoreManifest.featuresFor(rootDir, store)
 
 kotlin {
     listOf(

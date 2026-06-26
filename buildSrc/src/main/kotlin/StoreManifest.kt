@@ -8,11 +8,16 @@ import java.util.Properties
  * Each store's data lives in its own config file: `config/stores/<store>.properties`, e.g.
  * `config/stores/storeA.properties`:
  * ```
- * applicationId=com.isharaw.kmpproj.storea
+ * storeName=storeA
  * features=login,cart,invoices,settings,orders,rebate,passwordReset
  * ```
- * The store name is the file name (without extension). To add a store: create
+ * The store key is the file name (without extension). To add a store: create
  * `config/stores/<store>.properties` (and that store's Android branding) — no edits here.
+ *
+ * Every function takes the Gradle **rootDir** (pass `rootDir` from a build script). Config is resolved
+ * relative to it — **NOT** via `System.getProperty("user.dir")`, which is unreliable: under Android
+ * Studio's Gradle sync (and sometimes the daemon) `user.dir` is not the project root (it can be the
+ * user's home dir), so `config/stores` would resolve to the wrong place.
  *
  * NOTE (configuration cache): these files are read with `java.io.File` during configuration. With the
  * Gradle configuration cache enabled, editing a config file may not invalidate the cache on its own —
@@ -25,9 +30,6 @@ object StoreManifest {
     /** Base package; each store's applicationId is derived as BASE_APPLICATION_ID + "." + store name. */
     const val BASE_APPLICATION_ID = "com.isharaw.kmpproj"
 
-    /** Common config dir holding one <store>.properties per store (resolved from the root project). */
-    private val storesDir = File(System.getProperty("user.dir"), "config/stores")
-
     private data class StoreConfig(val storeName: String, val features: List<String>)
 
     // NOTE: read fresh on every access (no `by lazy`/cached val). `object StoreManifest` lives for the
@@ -35,19 +37,25 @@ object StoreManifest {
     // the daemon restarts. Re-reading a few small files during configuration is negligible.
 
     /** store -> feature list (the public shape consumers already use). */
-    val stores: Map<String, List<String>> get() = loadConfigs().mapValues { it.value.features }
+    fun stores(rootDir: File): Map<String, List<String>> =
+        loadConfigs(rootDir).mapValues { it.value.features }
 
-    fun featuresFor(store: String): List<String> =
-        loadConfigs()[store]?.features ?: error("Unknown store '$store'. Known stores: ${loadConfigs().keys}")
+    fun featuresFor(rootDir: File, store: String): List<String> =
+        config(rootDir, store).features
 
-    fun storeName(store: String): String =
-        loadConfigs()[store]?.storeName ?: error("Unknown store '$store'. Known stores: ${loadConfigs().keys}")
+    fun storeName(rootDir: File, store: String): String =
+        config(rootDir, store).storeName
 
     /** applicationId is derived: base package + the store name appended (lowercased). */
-    fun applicationId(store: String): String =
-        "$BASE_APPLICATION_ID.${storeName(store).lowercase()}"
+    fun applicationId(rootDir: File, store: String): String =
+        "$BASE_APPLICATION_ID.${storeName(rootDir, store).lowercase()}"
 
-    private fun loadConfigs(): Map<String, StoreConfig> {
+    private fun config(rootDir: File, store: String): StoreConfig =
+        loadConfigs(rootDir)[store]
+            ?: error("Unknown store '$store'. Known stores: ${loadConfigs(rootDir).keys}")
+
+    private fun loadConfigs(rootDir: File): Map<String, StoreConfig> {
+        val storesDir = File(rootDir, "config/stores")
         val files = storesDir.listFiles { f -> f.isFile && f.extension == "properties" }
             ?: error("Cannot list store config files under $storesDir")
         val found = files.map { file ->

@@ -8,7 +8,9 @@ New here? Start with the architecture overview, then the topic guides:
   (incl. how to set up this store/feature system in a new project)
 - [docs/STORES_AND_FEATURES.md](./docs/STORES_AND_FEATURES.md) — the store/feature design
 - [docs/ADDING_STORES_AND_FEATURES.md](./docs/ADDING_STORES_AND_FEATURES.md) — how-to with steps
+- [docs/METRO_DI_FROM_ZERO.md](./docs/METRO_DI_FROM_ZERO.md) — Metro DI **from absolute zero** (very beginner; start here for DI)
 - [docs/METRO_DI.md](./docs/METRO_DI.md) — how dependency injection (Metro) works, for beginners
+- [docs/METRO_SCOPES.md](./docs/METRO_SCOPES.md) — custom scopes & a per-login **session scope** (graph extensions)
 - [docs/DI_CONVENTIONS.md](./docs/DI_CONVENTIONS.md) — api/real module split + Metro conventions
 - [docs/EXPERIENCES.md](./docs/EXPERIENCES.md) — per-user (USBL/CABL) runtime behaviour
 - [docs/ACCESS_CONTROL.md](./docs/ACCESS_CONTROL.md) — business-unit/role access control (capabilities vs permissions), beginner-friendly

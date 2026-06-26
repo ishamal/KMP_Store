@@ -37,6 +37,9 @@ interface AppGraph : ViewModelGraph {
     val authenticator: Authenticator
     val sessionManager: SessionManager
     val accessControl: AccessControl
+
+    // Builds the customer (logged-in) child graph; the app shell creates one after login.
+    val customerGraphFactory: CustomerGraph.Factory
 }
 
 fun createAppGraph(): AppGraph = createGraph<AppGraph>()

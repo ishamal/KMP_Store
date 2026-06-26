@@ -24,6 +24,7 @@ import com.isharaw.kmpproj.core.LocalExperience
 import com.isharaw.kmpproj.core.LocalNavigator
 import com.isharaw.kmpproj.core.Navigator
 import com.isharaw.kmpproj.core.access.ui.AccessGuard
+import com.isharaw.kmpproj.core.access.ui.LocalAccessControl
 import com.isharaw.kmpproj.core.access.ui.LocalAccessGuard
 import com.isharaw.kmpproj.core.has
 import com.isharaw.kmpproj.di.AppGraph
@@ -61,8 +62,12 @@ fun App() {
                     onLoginSuccess = { graph.sessionManager.session = it },
                 )
             } else {
-                // Publish the logged-in experience + the access guard (business unit + role) once;
-                // UI reads them ambiently. Permissions are checked in the UI via PermissionGate.
+                // Build the customer (logged-in) child graph; dropped when `session` becomes null
+                // (logout), so its CustomerScope ViewModels are rebuilt fresh on the next login.
+                val customerGraph = remember(session) { graph.customerGraphFactory.create() }
+
+                // Publish the logged-in experience + access guard, and swap the ViewModel factory to
+                // the customer graph's (so customer-scoped VMs like RebateViewModel resolve).
                 CompositionLocalProvider(
                     LocalExperience provides session.experience,
                     LocalAccessGuard provides AccessGuard(
@@ -70,6 +75,9 @@ fun App() {
                         businessUnit = session.businessUnit,
                         userRole = session.userRole,
                     ),
+                    // Stateless policy for the explicit-identity gates (identity comes via ViewModels).
+                    LocalAccessControl provides graph.accessControl,
+                    LocalMetroViewModelFactory provides customerGraph.metroViewModelFactory,
                 ) {
                     MainScaffold(graph = graph, experience = session.experience)
                 }
