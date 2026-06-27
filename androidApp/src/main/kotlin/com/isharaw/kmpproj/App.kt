@@ -78,7 +78,7 @@ private fun MainScaffold(graph: AppGraph, snapshot: ExperienceSnapshot) {
             .sortedBy { it.meta.order }
             .filter { tab ->
                 val id = tab.meta.featureId
-                id == null || snapshot.resolvedFeatures.any { it.featureId == id }
+                id == null || snapshot.hasFeature(id)
             }
     }
     val backStack = remember(tabs) { mutableStateListOf<NavKey>(tabs.first().key) }

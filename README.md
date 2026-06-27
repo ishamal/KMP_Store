@@ -15,6 +15,7 @@ New here? Start with the architecture overview, then the topic guides:
 - [docs/EXPERIENCES.md](./docs/EXPERIENCES.md) — per-user (USBL/CABL) runtime behaviour
 - [docs/ACCESS_CONTROL.md](./docs/ACCESS_CONTROL.md) — business-unit/role access control (capabilities vs permissions), beginner-friendly
 - [docs/ACCESS_CONTROL_USAGE.md](./docs/ACCESS_CONTROL_USAGE.md) — access control usage reference (copy-paste recipes)
+- [docs/ACCESS_OPTIMIZATION.md](./docs/ACCESS_OPTIMIZATION.md) — how the ExperienceSnapshot access checks were optimized (lazy O(1) lookups)
 - [docs/TUTORIAL_ADD_ORDERS_FEATURE.md](./docs/TUTORIAL_ADD_ORDERS_FEATURE.md) — full worked example
 
 

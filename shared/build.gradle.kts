@@ -22,6 +22,8 @@ kotlin {
 
             // Export only the public :api contracts to Swift (never the Real impls).
             storeFeatures.forEach { export(project(":features:$it:api")) }
+            // ExperienceSnapshot + hasCapability so the iOS (SwiftUI) CapabilityGate can use them.
+            export(project(":core:experience:api"))
         }
     }
 
@@ -43,6 +45,7 @@ kotlin {
         iosMain.dependencies {
             implementation(project(":core:di:api"))
             implementation(project(":core:model:api"))
+            api(project(":core:experience:api")) // exported (ExperienceSnapshot + permission helpers)
             implementation(project(":core:session:api"))
             storeFeatures.forEach {
                 api(project(":features:$it:api"))            // contracts (exported)

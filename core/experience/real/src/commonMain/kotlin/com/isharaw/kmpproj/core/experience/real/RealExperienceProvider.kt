@@ -30,14 +30,15 @@ class RealExperienceProvider(
     override val features: List<Feature>
         get() = snapshot?.resolvedFeatures?.toList().orEmpty()
 
+    // Delegate to the snapshot's cached O(1) lookups (no per-call re-scan).
     override fun capabilitiesOf(featureId: FeatureId): Set<String> =
-        features.firstOrNull { it.featureId == featureId }?.capabilities.orEmpty()
+        snapshot?.capabilitiesOf(featureId).orEmpty()
 
     override fun hasFeature(featureId: FeatureId): Boolean =
-        features.any { it.featureId == featureId }
+        snapshot?.hasFeature(featureId) ?: false
 
     override fun hasCapability(featureId: FeatureId, capability: String): Boolean =
-        capability in capabilitiesOf(featureId)
+        snapshot?.hasCapability(featureId, capability) ?: false
 
     /**
      * Builds the snapshot for a login by **deriving features from the [capabilities] list**: each

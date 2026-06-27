@@ -34,15 +34,34 @@ fun RebateScreen(state: RebateState) {
             }
         }
 
-        Spacer(Modifier.height(8.dp))
-        HorizontalDivider()
-        Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text("Total rebate", fontWeight = FontWeight.Bold)
-            Text(formatPrice(state.total), fontWeight = FontWeight.Bold)
+        // Restricted functions — each shown only when the user has the matching rebate capability.
+        if (state.canViewDaily || state.canViewTotal) {
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(8.dp))
+        }
+
+        // rebate.view.daily
+        if (state.canViewDaily) {
+            val daily = if (state.rebates.isNotEmpty()) state.total / state.rebates.size else 0.0
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text("Daily average")
+                Text(formatPrice(daily))
+            }
+        }
+
+        // rebate.view.total
+        if (state.canViewTotal) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text("Total rebate", fontWeight = FontWeight.Bold)
+                Text(formatPrice(state.total), fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
