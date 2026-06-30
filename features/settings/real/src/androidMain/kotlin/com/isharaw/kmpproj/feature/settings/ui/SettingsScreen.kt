@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -23,8 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.isharaw.kmpproj.core.Experience
 import com.isharaw.kmpproj.core.FeatureAction
 import com.isharaw.kmpproj.core.FeatureKind
+import com.isharaw.kmpproj.core.LocalExperienceController
 import com.isharaw.kmpproj.core.LocalNavigator
 import com.isharaw.kmpproj.feature.settings.SettingsRepository
 
@@ -50,6 +53,13 @@ fun SettingsScreen(
         Text("Signed in as", style = MaterialTheme.typography.labelMedium)
         Text(userEmail, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(16.dp))
+        HorizontalDivider()
+
+        // In-app store switcher: flips the active experience, which re-themes the whole app (colors +
+        // wordings) at runtime via the runtime brand registry. Features stay gated by the session.
+        Spacer(Modifier.height(16.dp))
+        StoreSwitcher()
+        Spacer(Modifier.height(8.dp))
         HorizontalDivider()
 
         // Rebate → card, before the toggles.
@@ -86,6 +96,26 @@ fun SettingsScreen(
         Spacer(Modifier.height(24.dp))
         OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) {
             Text("Log out")
+        }
+    }
+}
+
+@Composable
+private fun StoreSwitcher() {
+    val controller = LocalExperienceController.current
+    Text("Store experience", style = MaterialTheme.typography.labelMedium)
+    Spacer(Modifier.height(8.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Experience.entries.forEach { experience ->
+            FilterChip(
+                selected = controller.current == experience,
+                onClick = { controller.switch(experience) },
+                // Label by the experience name; per-brand wordings live in androidApp (not visible here).
+                label = { Text(experience.name) },
+            )
         }
     }
 }

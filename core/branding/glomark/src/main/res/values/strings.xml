@@ -1,0 +1,7 @@
+<resources>
+    <!-- GLOMARK wordings. Identical keys to the other brand modules; this module's own R keeps them distinct. -->
+    <string name="app_name">Glomark</string>
+    <string name="welcome">Welcome to Glomark</string>
+    <string name="tagline">Shop smart</string>
+    <string name="login_cta">Sign in to Glomark</string>
+</resources>

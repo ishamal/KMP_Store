@@ -27,6 +27,7 @@ kotlin {
         androidMain.dependencies {
             api(project(":core:model:api"))     // Capability, Experience, has()
             implementation(libs.compose.runtime)
+            api(libs.compose.ui)                 // Color — exposed in the public BrandColors type
         }
     }
 }

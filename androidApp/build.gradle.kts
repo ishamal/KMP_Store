@@ -64,6 +64,10 @@ dependencies {
     implementation(projects.core.model.api)
     implementation(projects.core.navigation.api)
     implementation(projects.core.ui.api)
+    // Per-brand string resources (identical keys, own R each); brandingFor picks the active brand.
+    implementation(projects.core.branding.keells)
+    implementation(projects.core.branding.cargills)
+    implementation(projects.core.branding.glomark)
     implementation(projects.core.session.api)
     // Links the SessionManager implementation into the app graph for every store.
     implementation(projects.core.session.real)

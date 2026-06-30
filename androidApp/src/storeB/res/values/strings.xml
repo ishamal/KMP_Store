@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Store B</string>
-    <string name="welcome_message">Welcome to Store B</string>
+    <!-- Launcher label only (build-time, per flavor). In-app wordings come from core/ui BrandTheme. -->
+    <string name="app_name">Cargills</string>
 </resources>

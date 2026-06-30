@@ -1,0 +1,7 @@
+<resources>
+    <!-- CARGILLS wordings. Identical keys to the other brand modules; this module's own R keeps them distinct. -->
+    <string name="app_name">Cargills</string>
+    <string name="welcome">Welcome to Cargills FoodCity</string>
+    <string name="tagline">On the path of life</string>
+    <string name="login_cta">Sign in to Cargills</string>
+</resources>

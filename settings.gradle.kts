@@ -43,6 +43,11 @@ include(":core:navigation:api")
 include(":core:navigation:real")
 include(":core:ui:api")
 include(":core:ui:real")
+// Per-brand string resources. One module per experience, each with IDENTICAL string keys but its own R
+// namespace — so the keys don't clash and the active brand's strings are picked at runtime by code.
+include(":core:branding:keells")
+include(":core:branding:cargills")
+include(":core:branding:glomark")
 include(":features:login:api")
 include(":features:login:real")
 include(":features:cart:api")

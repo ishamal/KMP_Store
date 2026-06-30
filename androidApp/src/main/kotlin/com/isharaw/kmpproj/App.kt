@@ -2,24 +2,32 @@ package com.isharaw.kmpproj
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavKey
-import com.isharaw.kmpproj.branding.BrandColors
+import com.isharaw.kmpproj.branding.FlavorDefaults
+import com.isharaw.kmpproj.branding.brandColorsFor
+import com.isharaw.kmpproj.branding.brandingFor
+import com.isharaw.kmpproj.branding.colorSchemeFor
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.isharaw.kmpproj.core.Branding
+import com.isharaw.kmpproj.core.Experience
+import com.isharaw.kmpproj.core.ExperienceController
 import com.isharaw.kmpproj.core.ExperienceSnapshot
 import com.isharaw.kmpproj.core.LocalBranding
+import com.isharaw.kmpproj.core.LocalBrandColorScheme
+import com.isharaw.kmpproj.core.LocalExperienceController
 import com.isharaw.kmpproj.core.LocalNavigator
 import com.isharaw.kmpproj.core.Navigator
 import com.isharaw.kmpproj.di.AppGraph
@@ -29,27 +37,36 @@ import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
 
 @Composable
 fun App() {
-    // Per-store brand colors come from androidApp/src/<store>/kotlin/.../BrandColors.kt (flavor
-    // source set). Applied once, so every screen (incl. feature screens) picks up the active theme.
-    val brandColors = lightColorScheme(
-        primary = BrandColors.primary,
-        secondary = BrandColors.secondary,
-    )
-    // Per-store wordings from the active flavor's strings.xml, published for feature screens to read.
-    val branding = Branding(
-        appName = stringResource(R.string.app_name),
-        welcome = stringResource(R.string.welcome_message),
-    )
-    MaterialTheme(colorScheme = brandColors) {
-        val graph = remember { createAppGraph() }
-        // Make Metro's VM factory + per-store branding available to any screen below.
+    val graph = remember { createAppGraph() }
+    // Observable session (RealSessionManager is Compose-backed): null → login, else → app.
+    val session = graph.sessionManager.session
+
+    // The active store brand. Seeded from the flavor's pinned default (the brand shown before login),
+    // then follows the logged-in snapshot — and can be switched in-app via LocalExperienceController.
+    var currentExperience by remember { mutableStateOf(FlavorDefaults.defaultExperience) }
+    LaunchedEffect(session) {
+        // Adopt the session's resolved experience on login; fall back to the flavor default on logout.
+        currentExperience = session?.snapshot?.experience ?: FlavorDefaults.defaultExperience
+    }
+    val experienceController = remember {
+        object : ExperienceController {
+            override val current: Experience get() = currentExperience
+            override fun switch(experience: Experience) { currentExperience = experience }
+        }
+    }
+
+    // Colors (Material scheme + custom) and wordings for the active experience are resolved per
+    // Experience, so switching the experience re-themes the whole app — including feature screens.
+    val colorScheme = colorSchemeFor(currentExperience)
+    MaterialTheme(colorScheme = colorScheme) {
+        // Make Metro's VM factory + the active brand (wordings, custom colors) + store switcher
+        // available to any screen below.
         CompositionLocalProvider(
             LocalMetroViewModelFactory provides graph.metroViewModelFactory,
-            LocalBranding provides branding,
+            LocalBranding provides brandingFor(currentExperience),
+            LocalBrandColorScheme provides brandColorsFor(currentExperience),
+            LocalExperienceController provides experienceController,
         ) {
-            // Observable session (RealSessionManager is Compose-backed): null → login, else → app.
-            val session = graph.sessionManager.session
-
             // Keep the app-scoped reader in sync with the session: load the snapshot when home loads,
             // clear it on logout (so one user's snapshot can't leak to the next). Runs synchronously on
             // session change, before any child reads the reader.
