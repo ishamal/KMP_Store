@@ -50,6 +50,15 @@ fun App() {
             // Observable session (RealSessionManager is Compose-backed): null → login, else → app.
             val session = graph.sessionManager.session
 
+            // Keep the app-scoped reader in sync with the session: load the snapshot when home loads,
+            // clear it on logout (so one user's snapshot can't leak to the next). Runs synchronously on
+            // session change, before any child reads the reader.
+            remember(session) {
+                val current = session
+                if (current != null) graph.experienceReader.load(current.snapshot)
+                else graph.experienceReader.clear()
+            }
+
             if (session == null) {
                 LoginScreen(
                     validator = graph.loginValidator,
@@ -57,13 +66,7 @@ fun App() {
                     onLoginSuccess = { graph.sessionManager.session = it },
                 )
             } else {
-                // CustomerScope starts here: build the customer child graph for this login. Keyed on
-                // `session`, so logout (session → null) leaves this branch and drops the graph — ending
-                // the scope; the next login builds a fresh one.
-                val customerGraph = remember(session) {
-                    graph.customerGraphFactory.create(session.snapshot)
-                }
-                MainScaffold(graph = graph, snapshot = customerGraph.snapshot)
+                MainScaffold(graph = graph, snapshot = session.snapshot)
             }
         }
     }

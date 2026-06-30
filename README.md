@@ -16,6 +16,7 @@ New here? Start with the architecture overview, then the topic guides:
 - [docs/ACCESS_CONTROL.md](./docs/ACCESS_CONTROL.md) — business-unit/role access control (capabilities vs permissions), beginner-friendly
 - [docs/ACCESS_CONTROL_USAGE.md](./docs/ACCESS_CONTROL_USAGE.md) — access control usage reference (copy-paste recipes)
 - [docs/ACCESS_OPTIMIZATION.md](./docs/ACCESS_OPTIMIZATION.md) — how the ExperienceSnapshot access checks were optimized (lazy O(1) lookups)
+- [docs/PRODUCT_AND_APPID.md](./docs/PRODUCT_AND_APPID.md) — super-app **Product vs Experience (AppId)** split (build-time binary vs runtime brand)
 - [docs/TUTORIAL_ADD_ORDERS_FEATURE.md](./docs/TUTORIAL_ADD_ORDERS_FEATURE.md) — full worked example
 
 

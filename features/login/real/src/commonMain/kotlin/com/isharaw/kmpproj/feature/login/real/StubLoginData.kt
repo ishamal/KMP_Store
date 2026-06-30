@@ -43,4 +43,19 @@ internal object StubLoginData {
             "order.view", "order.create", "rebate.view", "settings.view",
         )
     }
+
+    /**
+     * The flat permission list the "backend" returns alongside the capabilities. One-to-one vocabulary
+     * with the capabilities; the resolver keeps only keys present in **both** (capabilities ∩ permission
+     * list). Here it's the full catalog, so the intersection equals the capabilities — tighten it to
+     * remove specific keys from the resolved features.
+     */
+    fun permitionListFor(businessUnit: BusinessUnit): Set<String> = setOf(
+        "cart.view", "cart.add", "cart.remove", "cart.checkout",
+        "catalog.view",
+        "invoice.view", "invoice.export",
+        "order.view", "order.create", "order.update", "order.cancel",
+        "rebate.view", "rebate.view.total", "rebate.view.daily",
+        "settings.view", "settings.edit",
+    )
 }

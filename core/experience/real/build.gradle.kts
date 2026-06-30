@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// :core:experience:real — RealExperienceProvider: reads the current ExperienceSnapshot off the
-// session and answers feature/capability queries. Applies Metro to contribute its binding.
+// :core:experience:real — RealExperienceResolver (builds the snapshot at login) and
+// RealExperienceReader (app-scoped set-later holder for the snapshot + queries). Applies Metro.
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
@@ -25,8 +25,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":core:experience:api"))
-            implementation(project(":core:di:api"))      // AppScope
-            implementation(project(":core:session:api")) // reads Session.snapshot
+            implementation(project(":core:di:api")) // AppScope, CustomerScope
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

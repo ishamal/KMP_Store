@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import com.isharaw.kmpproj.core.AppScope
-import com.isharaw.kmpproj.core.ExperienceProvider
+import com.isharaw.kmpproj.core.ExperienceReader
 import com.isharaw.kmpproj.core.FeatureId
 import com.isharaw.kmpproj.feature.rebate.RebateRepository
 import dev.zacsweers.metro.ContributesIntoMap
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 @ViewModelKey(RebateViewModel::class)
 class RebateViewModel(
     private val repository: RebateRepository,
-    private val experience: ExperienceProvider,
+    private val experience: ExperienceReader,
 ) : MoleculeViewModel<RebateEvent, RebateState>() {
 
     @Composable
@@ -26,7 +26,6 @@ class RebateViewModel(
         val rebates = remember { repository.available() }
         val total = remember { repository.total() }
 
-        // Function-level restriction: each rebate function is shown only if its capability is present.
         val canViewTotal = remember { experience.hasCapability(FeatureId.REBATE, "rebate.view.total") }
         val canViewDaily = remember { experience.hasCapability(FeatureId.REBATE, "rebate.view.daily") }
 
