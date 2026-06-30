@@ -1,8 +1,0 @@
-<resources>
-    <!-- KEELS wordings. Identical keys to the other brand modules; this module's own R keeps them
-         distinct. Add res/values-si/strings.xml etc. to translate. -->
-    <string name="app_name">Keells</string>
-    <string name="welcome">Welcome to Keells Super</string>
-    <string name="tagline">Fresh every day</string>
-    <string name="login_cta">Sign in to Keells</string>
-</resources>

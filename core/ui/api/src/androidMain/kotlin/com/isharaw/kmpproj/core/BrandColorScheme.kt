@@ -34,6 +34,8 @@ data class BrandColorScheme(
     val success: Color,
     val warning: Color,
     val divider: Color,
+    val buttonBackground: Color,
+    val cardBackground: Color,
 )
 
 /** Provided once at the app root; read anywhere with `LocalBrandColorScheme.current`. */

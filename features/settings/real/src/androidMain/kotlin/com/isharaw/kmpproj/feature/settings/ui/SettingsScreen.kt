@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.isharaw.kmpproj.core.AppTheme
 import com.isharaw.kmpproj.core.Experience
 import com.isharaw.kmpproj.core.FeatureAction
 import com.isharaw.kmpproj.core.FeatureKind
@@ -41,6 +44,7 @@ fun SettingsScreen(
     var darkMode by remember { mutableStateOf(repository.darkMode) }
     var notifications by remember { mutableStateOf(repository.notifications) }
     val navigator = LocalNavigator.current
+    val brand = AppTheme.colors
 
     // Settings decides how each non-common feature looks/where it sits, keyed by FeatureKind.
     val rebate = actions.firstOrNull { it.kind == FeatureKind.REBATE }
@@ -68,6 +72,7 @@ fun SettingsScreen(
             Card(
                 onClick = { navigator.goTo(action.target) },
                 modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = brand.cardBackground),
             ) {
                 Text(
                     action.label,
@@ -94,7 +99,11 @@ fun SettingsScreen(
 
         HorizontalDivider()
         Spacer(Modifier.height(24.dp))
-        OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = brand.buttonBackground),
+        ) {
             Text("Log out")
         }
     }

@@ -16,6 +16,7 @@ val GlomarkSuccess = Color(0xFF2E7D32)
 val GlomarkWarning = Color(0xFFF9A825)
 val GlomarkDivider = Color(0xFFE0E0E0)
 val GlomarkErrorRed = Color(0xFFBA1A1A)
+val GlomarkCardBg = Color(0xFFFFF3E0)
 // …add the rest of your named colors here.
 
 // --- Semantic mapping: assign the named palette to the app's brand color roles. ---
@@ -36,4 +37,6 @@ val GlomarkColors = BrandColorScheme(
     success = GlomarkSuccess,
     warning = GlomarkWarning,
     divider = GlomarkDivider,
+    buttonBackground = GlomarkWarning,
+    cardBackground = GlomarkCardBg,
 )

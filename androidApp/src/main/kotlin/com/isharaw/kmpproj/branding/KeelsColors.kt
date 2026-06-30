@@ -20,6 +20,7 @@ val KeelsSuccess = Color(0xFF2E7D32)
 val KeelsWarning = Color(0xFFF9A825)
 val KeelsDivider = Color(0xFFE0E0E0)
 val KeelsErrorRed = Color(0xFFBA1A1A)
+val KeelsCardBg = Color(0xFFE8F5E9)
 // …add the rest of your named colors here.
 
 // --- Semantic mapping: assign the named palette to the app's brand color roles. ---
@@ -40,4 +41,6 @@ val KeelsColors = BrandColorScheme(
     success = KeelsSuccess,
     warning = KeelsWarning,
     divider = KeelsDivider,
+    buttonBackground = KeelsSuccess,
+    cardBackground = KeelsCardBg,
 )

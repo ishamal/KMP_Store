@@ -18,14 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import com.isharaw.kmpproj.branding.FlavorDefaults
 import com.isharaw.kmpproj.branding.brandColorsFor
-import com.isharaw.kmpproj.branding.brandingFor
 import com.isharaw.kmpproj.branding.colorSchemeFor
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.isharaw.kmpproj.core.Experience
 import com.isharaw.kmpproj.core.ExperienceController
 import com.isharaw.kmpproj.core.ExperienceSnapshot
-import com.isharaw.kmpproj.core.LocalBranding
 import com.isharaw.kmpproj.core.LocalBrandColorScheme
 import com.isharaw.kmpproj.core.LocalExperienceController
 import com.isharaw.kmpproj.core.LocalNavigator
@@ -63,7 +61,6 @@ fun App() {
         // available to any screen below.
         CompositionLocalProvider(
             LocalMetroViewModelFactory provides graph.metroViewModelFactory,
-            LocalBranding provides brandingFor(currentExperience),
             LocalBrandColorScheme provides brandColorsFor(currentExperience),
             LocalExperienceController provides experienceController,
         ) {

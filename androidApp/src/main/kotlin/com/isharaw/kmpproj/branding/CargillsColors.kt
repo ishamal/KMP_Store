@@ -16,6 +16,7 @@ val CargillsSuccess = Color(0xFF2E7D32)
 val CargillsWarning = Color(0xFFF9A825)
 val CargillsDivider = Color(0xFFE0E0E0)
 val CargillsErrorRed = Color(0xFFBA1A1A)
+val CargillsCardBg = Color(0xFFFFEBEE)
 // …add the rest of your named colors here.
 
 // --- Semantic mapping: assign the named palette to the app's brand color roles. ---
@@ -36,4 +37,6 @@ val CargillsColors = BrandColorScheme(
     success = CargillsSuccess,
     warning = CargillsWarning,
     divider = CargillsDivider,
+    buttonBackground = CargillsYellow,
+    cardBackground = CargillsCardBg,
 )
