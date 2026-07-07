@@ -7,3 +7,6 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
 }
+
+// iOS store scaffolding task (`generateIosStore`) — kept in its own script for readability.
+apply(from = "gradle/generate-ios-store.gradle.kts")
