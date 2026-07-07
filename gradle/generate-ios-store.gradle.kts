@@ -49,7 +49,7 @@ tasks.register("generateIosStore") {
             // Do not edit by hand; re-run the task instead.
             TEAM_ID=
 
-            PRODUCT_NAME=KmpProj
+            PRODUCT_NAME=$store
             PRODUCT_BUNDLE_IDENTIFIER=$appId
 
             CURRENT_PROJECT_VERSION=1
@@ -84,7 +84,7 @@ tasks.register("generateIosStore") {
                         <BuildableReference
                            BuildableIdentifier = "primary"
                            BlueprintIdentifier = "07488F9A9FA4A7D59E69DE7B"
-                           BuildableName = "KmpProj.app"
+                           BuildableName = "$store.app"
                            BlueprintName = "iosApp"
                            ReferencedContainer = "container:iosApp.xcodeproj">
                         </BuildableReference>
@@ -114,7 +114,7 @@ tasks.register("generateIosStore") {
                      <BuildableReference
                         BuildableIdentifier = "primary"
                         BlueprintIdentifier = "07488F9A9FA4A7D59E69DE7B"
-                        BuildableName = "KmpProj.app"
+                        BuildableName = "$store.app"
                         BlueprintName = "iosApp"
                         ReferencedContainer = "container:iosApp.xcodeproj">
                      </BuildableReference>
@@ -131,7 +131,7 @@ tasks.register("generateIosStore") {
                      <BuildableReference
                         BuildableIdentifier = "primary"
                         BlueprintIdentifier = "07488F9A9FA4A7D59E69DE7B"
-                        BuildableName = "KmpProj.app"
+                        BuildableName = "$store.app"
                         BlueprintName = "iosApp"
                         ReferencedContainer = "container:iosApp.xcodeproj">
                      </BuildableReference>
