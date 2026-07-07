@@ -30,7 +30,11 @@ object StoreManifest {
     /** Base package; each store's applicationId is derived as BASE_APPLICATION_ID + "." + store name. */
     const val BASE_APPLICATION_ID = "com.isharaw.kmpproj"
 
-    private data class StoreConfig(val storeName: String, val features: List<String>)
+    private data class StoreConfig(
+        val storeName: String,
+        val features: List<String>,
+        val businessUnitDefaults: String,
+    )
 
     // NOTE: read fresh on every access (no `by lazy`/cached val). `object StoreManifest` lives for the
     // whole Gradle daemon JVM, so a cached value would not pick up a newly added store.properties until
@@ -45,6 +49,13 @@ object StoreManifest {
 
     fun storeName(rootDir: File, store: String): String =
         config(rootDir, store).storeName
+
+    /**
+     * The raw `businessUnitDefaults` string for [store], e.g. `"KEELS:USBL,CARGILLS:SENM"`.
+     * Empty string if the key is absent from the store's `.properties` file.
+     */
+    fun businessUnitDefaultsFor(rootDir: File, store: String): String =
+        config(rootDir, store).businessUnitDefaults
 
     /** applicationId is derived: base package + the store name appended (lowercased). */
     fun applicationId(rootDir: File, store: String): String =
@@ -65,7 +76,12 @@ object StoreManifest {
             // The store name drives the applicationId suffix; defaults to the file name if omitted.
             val storeName = props.getProperty("storeName")?.trim()?.takeIf { it.isNotEmpty() }
                 ?: file.nameWithoutExtension
-            file.nameWithoutExtension to StoreConfig(storeName = storeName, features = features)
+            val businessUnitDefaults = props.getProperty("businessUnitDefaults")?.trim().orEmpty()
+            file.nameWithoutExtension to StoreConfig(
+                storeName = storeName,
+                features = features,
+                businessUnitDefaults = businessUnitDefaults,
+            )
         }.sortedBy { it.first }
         check(found.isNotEmpty()) { "No <store>.properties files found under $storesDir" }
         return found.toMap()

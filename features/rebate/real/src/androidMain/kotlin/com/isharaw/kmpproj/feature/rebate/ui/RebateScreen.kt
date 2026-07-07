@@ -15,46 +15,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.isharaw.kmpproj.core.PermissionGate
 import com.isharaw.kmpproj.core.formatPrice
 
-/** Pure, state-driven rebate screen (state comes from RebateViewModel). */
+/**
+ * State-driven rebate screen. Restricted rows are gated via [PermissionGate] reading
+ * [com.isharaw.kmpproj.core.LocalExperienceSnapshot] — the gates react to live Business Unit /
+ * Experience switches without any extra state threading.
+ *
+ * Capability mapping (from the resolved snapshot):
+ *  - `rebate.view.daily` — the per-rebate breakdown rows
+ *  - `rebate.view.total` — the bold total row
+ */
 @Composable
 fun RebateScreen(state: RebateState) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Rebates", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(12.dp))
 
-        state.rebates.forEach { rebate ->
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(rebate.label)
-                Text(formatPrice(rebate.amount))
+        // Per-rebate breakdown — only users with rebate.view.daily see each row.
+        PermissionGate(capability = "rebate.view.daily") {
+            state.rebates.forEach { rebate ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(rebate.label)
+                    Text(formatPrice(rebate.amount))
+                }
             }
-        }
-
-        // Restricted functions — each shown only when the user has the matching rebate capability.
-        if (state.canViewDaily || state.canViewTotal) {
             Spacer(Modifier.height(8.dp))
             HorizontalDivider()
             Spacer(Modifier.height(8.dp))
         }
 
-        // rebate.view.daily
-        if (state.canViewDaily) {
-            val daily = if (state.rebates.isNotEmpty()) state.total / state.rebates.size else 0.0
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text("Daily average")
-                Text(formatPrice(daily))
-            }
-        }
-
-        // rebate.view.total
-        if (state.canViewTotal) {
+        // Total row — only users with rebate.view.total see the aggregate.
+        PermissionGate(capability = "rebate.view.total") {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,

@@ -27,11 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.isharaw.kmpproj.core.AppTheme
+import com.isharaw.kmpproj.core.BusinessUnit
 import com.isharaw.kmpproj.core.Experience
 import com.isharaw.kmpproj.core.FeatureAction
 import com.isharaw.kmpproj.core.FeatureKind
 import com.isharaw.kmpproj.core.LocalExperienceController
+import com.isharaw.kmpproj.core.LocalExperienceSnapshot
 import com.isharaw.kmpproj.core.LocalNavigator
+import com.isharaw.kmpproj.core.LocalSnapshotController
+import com.isharaw.kmpproj.core.SnapshotController
 import com.isharaw.kmpproj.feature.settings.SettingsRepository
 
 @Composable
@@ -59,10 +63,14 @@ fun SettingsScreen(
         Spacer(Modifier.height(16.dp))
         HorizontalDivider()
 
-        // In-app store switcher: flips the active experience, which re-themes the whole app (colors +
-        // wordings) at runtime via the runtime brand registry. Features stay gated by the session.
+        // In-app store switcher: flips the active experience, which re-themes the whole app and
+        // recomputes the capability snapshot for the new experience's default BU.
         Spacer(Modifier.height(16.dp))
         StoreSwitcher()
+        Spacer(Modifier.height(8.dp))
+
+        // Business-Unit selector: visible only when the current experience has selectable BUs.
+        BusinessUnitSwitcher()
         Spacer(Modifier.height(8.dp))
         HorizontalDivider()
 
@@ -109,6 +117,10 @@ fun SettingsScreen(
     }
 }
 
+/**
+ * Experience (store brand) chips. Each chip triggers a full snapshot recompute via
+ * [SnapshotController.switchExperience], which also reselects the default BU for that experience.
+ */
 @Composable
 private fun StoreSwitcher() {
     val controller = LocalExperienceController.current
@@ -122,8 +134,41 @@ private fun StoreSwitcher() {
             FilterChip(
                 selected = controller.current == experience,
                 onClick = { controller.switch(experience) },
-                // Label by the experience name; per-brand wordings live in androidApp (not visible here).
                 label = { Text(experience.name) },
+            )
+        }
+    }
+}
+
+/**
+ * Business-Unit selector row. Shown only when the active experience has selectable BUs (i.e.
+ * [SnapshotController.availableBusinessUnitsFor] returns a non-empty list). Tapping a chip calls
+ * [SnapshotController.switchBusinessUnit], recomputing the snapshot with fresh capabilities for
+ * the new BU — [PermissionGate] consumers react automatically.
+ *
+ * For GLOMARK (no BU concept) this composable renders nothing.
+ */
+@Composable
+private fun BusinessUnitSwitcher() {
+    val controller = LocalSnapshotController.current ?: return
+    val snapshot = LocalExperienceSnapshot.current ?: return
+    val currentExperience = snapshot.experience
+    val availableBUs: List<BusinessUnit> = controller.availableBusinessUnitsFor(currentExperience)
+    if (availableBUs.isEmpty()) return
+
+    val currentBU = controller.currentBusinessUnit
+    Spacer(Modifier.height(4.dp))
+    Text("Business unit", style = MaterialTheme.typography.labelMedium)
+    Spacer(Modifier.height(8.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        availableBUs.forEach { bu ->
+            FilterChip(
+                selected = currentBU == bu,
+                onClick = { controller.switchBusinessUnit(bu) },
+                label = { Text(bu.name) },
             )
         }
     }

@@ -22,7 +22,9 @@ class RebateViewModel(
 ) : MoleculeViewModel<RebateEvent, RebateState>() {
 
     @Composable
-    override fun present(events: Flow<RebateEvent>): RebateState {
+    override fun present(
+        events: Flow<RebateEvent>,
+    ): RebateState {
         val rebates = remember { repository.available() }
         val total = remember { repository.total() }
 

@@ -2,6 +2,7 @@ package com.isharaw.kmpproj.feature.login.real
 
 import com.isharaw.kmpproj.core.BusinessUnit
 import com.isharaw.kmpproj.core.Experience
+import com.isharaw.kmpproj.core.StubCapabilities
 import com.isharaw.kmpproj.core.UserRole
 
 /**
@@ -27,35 +28,11 @@ internal object StubLoginData {
         else -> UserRole.USER
     }
 
-    /** The flat capability list the "backend" returns for a [businessUnit]; features derive from these. */
-    fun capabilitiesFor(businessUnit: BusinessUnit): Set<String> = when (businessUnit) {
-        BusinessUnit.USBL -> setOf(
-            "cart.view", "cart.add", "cart.remove", "cart.checkout",
-            "catalog.view",
-            "invoice.view", "invoice.export",
-            "order.view", "order.create", "order.update", "order.cancel",
-            "rebate.view","rebate.view.total","rebate.view.daily",
-            "settings.view", "settings.edit",
-        )
-        BusinessUnit.CABL -> setOf("cart.view", "invoice.view", "settings.view")
-        BusinessUnit.SENM -> setOf(
-            "cart.view", "cart.add", "catalog.view",
-            "order.view", "order.create", "rebate.view", "settings.view",
-        )
-    }
+    /** Delegates to [StubCapabilities] so both login and runtime BU-switch use the same source. */
+    fun capabilitiesFor(businessUnit: BusinessUnit): Set<String> =
+        StubCapabilities.capabilitiesFor(businessUnit)
 
-    /**
-     * The flat permission list the "backend" returns alongside the capabilities. One-to-one vocabulary
-     * with the capabilities; the resolver keeps only keys present in **both** (capabilities ∩ permission
-     * list). Here it's the full catalog, so the intersection equals the capabilities — tighten it to
-     * remove specific keys from the resolved features.
-     */
-    fun permitionListFor(businessUnit: BusinessUnit): Set<String> = setOf(
-        "cart.view", "cart.add", "cart.remove", "cart.checkout",
-        "catalog.view",
-        "invoice.view", "invoice.export",
-        "order.view", "order.create", "order.update", "order.cancel",
-        "rebate.view", "rebate.view.total", "rebate.view.daily",
-        "settings.view", "settings.edit",
-    )
+    /** Delegates to [StubCapabilities]. */
+    fun permitionListFor(businessUnit: BusinessUnit): Set<String> =
+        StubCapabilities.permissionListFor(businessUnit)
 }

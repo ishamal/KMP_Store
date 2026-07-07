@@ -5,6 +5,8 @@ import com.isharaw.kmpproj.feature.rebate.Rebate
 /**
  * MVI state for the rebate screen. [canViewTotal] / [canViewDaily] are the per-function restrictions
  * (computed in the ViewModel from the user's rebate capabilities), so the screen reads plain booleans.
+ * The [ExperienceSnapshot] is no longer threaded through state — screens read it via
+ * [com.isharaw.kmpproj.core.LocalExperienceSnapshot] and gates consume it implicitly.
  */
 data class RebateState(
     val rebates: List<Rebate>,

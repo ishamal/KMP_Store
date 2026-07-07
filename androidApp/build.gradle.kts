@@ -38,8 +38,17 @@ android {
             create(store) {
                 dimension = "store"
                 applicationId = StoreManifest.applicationId(storeRoot, store)
+                buildConfigField(
+                    "String",
+                    "BUSINESS_UNIT_DEFAULTS",
+                    "\"${StoreManifest.businessUnitDefaultsFor(storeRoot, store)}\"",
+                )
             }
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     packaging {
