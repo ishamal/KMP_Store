@@ -25,9 +25,10 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-            api(project(":core:model:api"))     // Capability, Experience, has()
+            api(project(":core:model:api"))         // Capability, Experience, has()
+            api(project(":core:navigation:api"))    // FeatureAction — in PermissionGate's public signature
             implementation(libs.compose.runtime)
-            api(libs.compose.ui)                 // Color — exposed in the public BrandColors type
+            api(libs.compose.ui)                     // Color — exposed in the public BrandColors type
         }
     }
 }

@@ -27,6 +27,7 @@ import com.isharaw.kmpproj.core.ExperienceSnapshot
 import com.isharaw.kmpproj.core.LocalBrandColorScheme
 import com.isharaw.kmpproj.core.LocalExperienceController
 import com.isharaw.kmpproj.core.LocalExperienceSnapshot
+import com.isharaw.kmpproj.core.LocalFeatureActions
 import com.isharaw.kmpproj.core.LocalNavigator
 import com.isharaw.kmpproj.core.LocalSnapshotController
 import com.isharaw.kmpproj.core.Navigator
@@ -124,6 +125,7 @@ fun App() {
             LocalExperienceController provides experienceController,
             LocalExperienceSnapshot provides currentSnapshot,
             LocalSnapshotController provides snapshotController,
+            LocalFeatureActions provides graph.featureActions,
         ) {
             // Keep the app-scoped reader in sync with the session on login/logout. The reader is
             // also updated on every BU/experience switch via recomputeAndLoad above.

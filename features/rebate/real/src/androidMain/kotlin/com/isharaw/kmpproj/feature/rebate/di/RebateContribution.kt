@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.EntryProviderInstaller
 import com.isharaw.kmpproj.core.FeatureAction
+import com.isharaw.kmpproj.core.FeatureId
 import com.isharaw.kmpproj.core.FeatureKind
 import com.isharaw.kmpproj.core.FeatureSlot
 import com.isharaw.kmpproj.feature.rebate.ui.RebateScreen
@@ -44,6 +45,7 @@ object RebateContribution {
             target = RebateKey,
             slot = FeatureSlot.SETTINGS,
             kind = FeatureKind.REBATE,
+            featureId = FeatureId.REBATE,
             order = 10,
         )
 }
