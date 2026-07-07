@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.isharaw.kmpproj.core.Capability
 import com.isharaw.kmpproj.core.PermissionGate
 import com.isharaw.kmpproj.core.formatPrice
 
@@ -34,7 +35,7 @@ fun RebateScreen(state: RebateState) {
         Spacer(Modifier.height(12.dp))
 
         // Per-rebate breakdown — only users with rebate.view.daily see each row.
-        PermissionGate(capability = "rebate.view.daily") {
+        PermissionGate(capability = Capability.REBATE_VIEW_DAILY) {
             state.rebates.forEach { rebate ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -50,7 +51,7 @@ fun RebateScreen(state: RebateState) {
         }
 
         // Total row — only users with rebate.view.total see the aggregate.
-        PermissionGate(capability = "rebate.view.total") {
+        PermissionGate(capability = Capability.REBATE_VIEW_TOTAL) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,

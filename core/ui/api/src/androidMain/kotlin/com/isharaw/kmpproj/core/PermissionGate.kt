@@ -5,17 +5,15 @@ import androidx.compose.runtime.Composable
 /**
  * **Android (Compose) permission wrapper.** The single gate for permission-based UI — it replaces the
  * former `FeatureGate` (feature check) and `CapabilityGate` (capability check) with one API that does
- * both from a single [capability] string.
+ * both from a single [capability].
  *
- * [capability] is a dotted key (e.g. `"order.view"`, `"rebate.view.total"`). From it the gate derives
- * two checks against the active [snapshot]:
- *  1. **feature** — [FeatureId.fromCapability] maps the prefix to a [FeatureId] (`"order.view"` →
- *     [FeatureId.ORDERS]); [content] shows only if the snapshot resolves that feature.
- *  2. **capability** — the snapshot must also grant the exact [capability].
- *
- * Both must hold. A more-specific capability (e.g. `"rebate.view.total"`) still inherits the parent
- * feature check because the prefix is unchanged. Passing `capability = null` disables gating entirely
- * ([content] always shows) — use that only for unconditional render.
+ * [capability] is a type-safe [Capability] entry (e.g. [Capability.ORDER_VIEW],
+ * [Capability.REBATE_VIEW_TOTAL]). The allow/deny decision is the shared [permits] rule (common to
+ * Android and iOS): it derives a [FeatureId] from the capability's prefix and requires both that the
+ * [snapshot] resolves that feature **and** grants the exact capability. A more-specific capability
+ * (e.g. [Capability.REBATE_VIEW_TOTAL]) still inherits the parent feature check because the prefix is
+ * unchanged. Passing `capability = null` disables gating entirely ([content] always shows) — use that
+ * only for unconditional render.
  *
  * [snapshot] defaults to [LocalExperienceSnapshot.current] — call sites inside an authenticated
  * session scope (where the app shell provides the local) can omit it. Pass an explicit value to
@@ -24,26 +22,22 @@ import androidx.compose.runtime.Composable
  *
  * ```
  * // Inside session scope — snapshot from CompositionLocal:
- * PermissionGate(capability = "order.view") {
+ * PermissionGate(capability = Capability.ORDER_VIEW) {
  *     OrdersSummaryCard(...)
  * }
  *
  * // Explicit override (preview / test):
- * PermissionGate(snapshot = previewSnapshot, capability = "order.create") {
+ * PermissionGate(snapshot = previewSnapshot, capability = Capability.ORDER_CREATE) {
  *     Button(onClick = { … }) { Text("New order") }
  * }
  * ```
  */
 @Composable
 fun PermissionGate(
-    capability: String? = null,
+    capability: Capability? = null,
     snapshot: ExperienceSnapshot? = LocalExperienceSnapshot.current,
     fallback: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    val featureId = capability?.let { FeatureId.fromCapability(it) }
-    val granted =
-        (featureId == null || snapshot?.hasFeature(featureId) == true) &&
-        (capability == null || snapshot?.hasCapability(capability) == true)
-    if (granted) content() else fallback()
+    if (snapshot.permits(capability)) content() else fallback()
 }
