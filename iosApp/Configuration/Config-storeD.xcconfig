@@ -2,7 +2,7 @@
 // Do not edit by hand; re-run the task instead.
 TEAM_ID=
 
-PRODUCT_NAME=KmpProj
+PRODUCT_NAME=storeD
 PRODUCT_BUNDLE_IDENTIFIER=com.isharaw.kmpproj.stored
 
 CURRENT_PROJECT_VERSION=1

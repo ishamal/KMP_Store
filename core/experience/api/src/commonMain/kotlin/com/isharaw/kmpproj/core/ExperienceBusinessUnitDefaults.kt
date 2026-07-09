@@ -3,8 +3,8 @@ package com.isharaw.kmpproj.core
 /**
  * The configured default [BusinessUnit] per [Experience] for this store build.
  *
- * Declared in `config/stores/<store>.properties` as a comma-separated list of `EXPERIENCE:BUSINESS_UNIT`
- * pairs (e.g. `businessUnitDefaults=KEELS:USBL,CARGILLS:SENM`), surfaced at runtime via
+ * Declared per store in the build-logic `STORES` table (Stores.kt) as a comma-separated list of
+ * `EXPERIENCE:BUSINESS_UNIT` pairs (e.g. `businessUnitDefaults = "KEELS:USBL,CARGILLS:SENM"`), surfaced at runtime via
  * `BuildConfig.BUSINESS_UNIT_DEFAULTS`. The app graph parses and holds one instance.
  *
  * Use [defaultFor] to retrieve the pre-configured BU when the user first switches to a given

@@ -4,12 +4,15 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.metro)
+    // Provides the `storeCatalog` extension (the STORES table in build-logic).
+    id("com.isharaw.store-catalog")
 }
 
-// The active store (defaults to StoreManifest.SELECTED_STORE) decides which feature modules
-// the iOS framework links and exports. See buildSrc/StoreManifest.kt.
-val store = providers.gradleProperty("store").getOrElse(StoreManifest.SELECTED_STORE)
-val storeFeatures = StoreManifest.featuresFor(rootDir, store)
+// The active store (defaults to storeCatalog.selectedStore) decides which feature modules the iOS
+// framework links and exports.
+val storeCatalog = extensions.getByType<com.isharaw.gradle.StoreCatalogExtension>()
+val store = providers.gradleProperty("store").getOrElse(storeCatalog.selectedStore)
+val storeFeatures = storeCatalog.featuresFor(store)
 
 kotlin {
     listOf(

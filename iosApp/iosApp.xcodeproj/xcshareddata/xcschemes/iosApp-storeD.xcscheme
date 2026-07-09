@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "07488F9A9FA4A7D59E69DE7B"
-               BuildableName = "KmpProj.app"
+               BuildableName = "storeD.app"
                BlueprintName = "iosApp"
                ReferencedContainer = "container:iosApp.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "07488F9A9FA4A7D59E69DE7B"
-            BuildableName = "KmpProj.app"
+            BuildableName = "storeD.app"
             BlueprintName = "iosApp"
             ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "07488F9A9FA4A7D59E69DE7B"
-            BuildableName = "KmpProj.app"
+            BuildableName = "storeD.app"
             BlueprintName = "iosApp"
             ReferencedContainer = "container:iosApp.xcodeproj">
          </BuildableReference>

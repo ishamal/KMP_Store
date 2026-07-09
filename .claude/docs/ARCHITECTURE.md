@@ -7,8 +7,8 @@ dirs:
     - core/ui: shared Android Compose helpers (FeatureGate, CapabilityGate, formatPrice) + branding theme (BrandColorScheme, LocalBrandColorScheme, AppTheme, ExperienceController). Avoids the compose-MPP plugin; depends on compose.ui for Color.
   - features/<name>/{api,real}: login, cart, invoices, settings, orders, rebate, passwordReset (+ features/test). Each :real registers tabs/nav entries + Metro bindings; flavors link only the :real modules their store lists.
   - androidApp/src/main: App shell + branding values (src/main/kotlin/.../branding/: per-brand color files KeelsColors/CargillsColors/GlomarkColors + BrandPalette mappers). src/<store>/ = flavor source sets (FlavorDefaults.kt pins the default Experience; res/values/strings.xml holds the launcher app_name only).
-  - config/stores/<store>.properties: store name + feature list (single source of truth, read by buildSrc/StoreManifest.kt).
-  - shared/: KMP shared (iOS bridge). buildSrc/: StoreManifest. _lean_dev_sessions/: prior session notes.
+  - build-logic/.../Stores.kt: the STORES table (store name + feature list + businessUnitDefaults) — single source of truth, a typed Kotlin list. The store-catalog/store-features convention plugins consume it.
+  - shared/: KMP shared (iOS bridge). build-logic/: included build with the store convention plugins. _lean_dev_sessions/: prior session notes.
 
 pattern:
   - Access/gating: backend (stubbed) resolves an ExperienceSnapshot at login (experience + businessUnit + role + resolvedFeatures). UI gates via snapshot.hasFeature/hasCapability and FeatureGate/CapabilityGate. Tabs filtered by resolved features AND which feature modules the flavor links.

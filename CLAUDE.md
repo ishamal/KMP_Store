@@ -11,7 +11,7 @@ sessions:_lean_dev_sessions/
 - Module split: `core/<name>/{api,real}` and `features/<name>/{api,real}`. `api` = interfaces + pure types (no Compose plugin); `real` = implementations + Compose UI + Metro bindings.
 - DI: Metro. Bind impls with `@ContributesBinding(AppScope::class)` + `@Inject`; app-wide singletons use `@SingleIn(AppScope::class)`.
 - Compose UI lives in each module's `androidMain`. Reference modules via type-safe accessors (`projects.core.ui.api`).
-- Stores are product flavors (storeA/B/C) defined ONLY by `config/stores/<store>.properties` — never hard-code store lists in build files. Adding a store = add its `.properties` + flavor source set.
+- Stores are product flavors (storeA/B/C/D) defined by the `STORES` table in `build-logic/src/main/kotlin/com/isharaw/gradle/Stores.kt` (a typed Kotlin list, the single source of truth for store→feature). The `com.isharaw.store-features` convention plugin turns each `StoreDef` into an Android product flavor; iOS reads the same catalog via `-Pstore`. Adding a store = add a `StoreDef` entry (+ its flavor source set / branding).
 - Experience-based theming is runtime (keyed by `Experience`), not per-flavor. Brand colors: add raw tokens + a `BrandColorScheme` in `androidApp/.../branding/<Brand>Colors.kt`; read via `AppTheme.colors.*` (custom roles) or `MaterialTheme.colorScheme` (Material slots).
 - Don't reintroduce a strings/wordings branding system — it was deliberately removed; only `BrandColorScheme` theming remains. `app_name` in flavor `strings.xml` is just the launcher label.
 
@@ -21,5 +21,5 @@ sessions:_lean_dev_sessions/
 - `androidApp/src/main/kotlin/.../branding/` — `BrandPalette.kt` (`brandColorsFor`/`colorSchemeFor`) + per-brand `*Colors.kt`.
 - `core/ui/.../BrandColorScheme.kt`, `AppTheme.kt`, `ExperienceController.kt` — theming types/accessors.
 - `core/experience/.../ExperienceSnapshot.kt` — access model (features/capabilities); `RealExperienceResolver`/`RealExperienceReader`.
-- `buildSrc/StoreManifest.kt` + `config/stores/*.properties` — flavor & feature source of truth.
+- `build-logic/` — included build with the `store-catalog`/`store-features` convention plugins; `Stores.kt` (`STORES` table) is the flavor & feature source of truth (replaced the old `buildSrc/StoreManifest.kt` + `config/stores/*.properties`).
 - `features/login/real/.../StubLoginData.kt` — stubbed backend/auth.

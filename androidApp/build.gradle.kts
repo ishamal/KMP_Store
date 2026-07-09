@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.metro)
+    // Creates the per-store product flavors and links each store's feature :real modules.
+    id("com.isharaw.store-features")
 }
 
 kotlin {
@@ -12,10 +14,6 @@ kotlin {
         jvmTarget = JvmTarget.JVM_11
     }
 }
-
-// Hoisted so StoreManifest resolves config/stores from the Gradle root (not user.dir), and so it's
-// unambiguous inside the android { } / dependencies { } blocks.
-val storeRoot = rootDir
 
 android {
     namespace = "com.isharaw.kmpproj"
@@ -29,23 +27,8 @@ android {
         versionName = "1.0"
     }
 
-    // Per-store builds, generated from buildSrc/StoreManifest.kt. Pick the variant
-    // (storeADebug / storeBDebug / …) from the Build Variants panel in Android Studio.
-    // Each store ships only the feature modules listed for it in the manifest.
-    flavorDimensions += "store"
-    productFlavors {
-        StoreManifest.stores(storeRoot).keys.forEach { store ->
-            create(store) {
-                dimension = "store"
-                applicationId = StoreManifest.applicationId(storeRoot, store)
-                buildConfigField(
-                    "String",
-                    "BUSINESS_UNIT_DEFAULTS",
-                    "\"${StoreManifest.businessUnitDefaultsFor(storeRoot, store)}\"",
-                )
-            }
-        }
-    }
+    // Per-store product flavors (storeADebug / storeBDebug / …) and their feature :real modules are
+    // created by the com.isharaw.store-features convention plugin from the build-logic STORES table.
 
     buildFeatures {
         buildConfig = true
@@ -98,11 +81,6 @@ dependencies {
     implementation(libs.metrox.viewmodel)
     implementation(libs.metrox.viewmodel.compose)
 
-
-    // Each flavor pulls in exactly the feature :real modules its store declares (:api is transitive).
-    StoreManifest.stores(storeRoot).forEach { (store, features) ->
-        features.forEach { feature ->
-            add("${store}Implementation", project(":features:$feature:real"))
-        }
-    }
+    // Per-store feature :real modules are added by the com.isharaw.store-features convention plugin
+    // (via `${'$'}{store}Implementation`), so unshipped features are removed from the build.
 }

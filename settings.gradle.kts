@@ -3,6 +3,8 @@ rootProject.name = "KmpProj"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    // Convention plugins (store-catalog / store-features) live in this included build, not buildSrc.
+    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {

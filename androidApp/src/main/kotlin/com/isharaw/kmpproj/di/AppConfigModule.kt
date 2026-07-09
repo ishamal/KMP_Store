@@ -10,7 +10,7 @@ import dev.zacsweers.metro.Provides
 /**
  * Bridges flavor-level [BuildConfig] constants into the Metro graph.
  * `BuildConfig.BUSINESS_UNIT_DEFAULTS` is a per-flavor string generated from
- * `config/stores/<store>.properties` (e.g. `"KEELS:USBL,CARGILLS:SENM"`).
+ * the build-logic `STORES` table (Stores.kt) (e.g. `"KEELS:USBL,CARGILLS:SENM"`).
  */
 @ContributesTo(AppScope::class)
 @BindingContainer

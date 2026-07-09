@@ -5,6 +5,6 @@ deps:
   - Navigation: AndroidX Navigation3 1.1.3 (NavKey, NavDisplay, entryProvider). Custom Navigator (core/navigation) wraps a back stack; LocalNavigator exposes goTo/back.
   - Presentation: Molecule 2.2.0 (molecule-runtime) available for state.
   - androidx lifecycle 2.11.0-beta01 (viewmodel-compose, runtime-compose), activity-compose 1.13.0.
-dev: Gradle + version catalog (gradle/libs.versions.toml). Type-safe project accessors enabled (e.g. projects.core.ui.api). buildSrc/StoreManifest.kt drives product flavors + per-store feature lists from config/stores/*.properties. Configuration cache is ON — editing config/stores/*.properties may not invalidate it; run --no-configuration-cache after such edits.
+dev: Gradle + version catalog (gradle/libs.versions.toml). Type-safe project accessors enabled (e.g. projects.core.ui.api). Store→feature wiring lives in the build-logic included build: the STORES table in build-logic/.../Stores.kt is the source of truth; the store-catalog/store-features convention plugins drive the Android product flavors and the iOS -Pstore framework build. Configuration cache is ON — editing Stores.kt recompiles build-logic and invalidates the cache automatically (no --no-configuration-cache needed).
 test: kotlin-test (commonTest), junit 4.13.2, androidx espresso/testExt for instrumented.
 db: none yet (no persistence layer). Login/backend are stubbed — see features/login/real StubLoginData.kt.

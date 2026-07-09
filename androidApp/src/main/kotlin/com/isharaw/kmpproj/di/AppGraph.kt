@@ -45,7 +45,7 @@ interface AppGraph : ViewModelGraph {
     // Builds an ExperienceSnapshot from login/BU-switch inputs; exposed for the BU switcher in App.kt.
     val experienceResolver: ExperienceResolver
 
-    // Per-store default BU per experience (from config/stores/<store>.properties → BuildConfig).
+    // Per-store default BU per experience (from the build-logic STORES table → BuildConfig).
     val experienceBusinessUnitDefaults: ExperienceBusinessUnitDefaults
 }
 
