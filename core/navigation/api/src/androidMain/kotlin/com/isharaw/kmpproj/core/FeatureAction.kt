@@ -2,26 +2,9 @@ package com.isharaw.kmpproj.core
 
 import androidx.navigation3.runtime.NavKey
 
-/**
- * A host surface where feature-contributed [FeatureAction]s render. Add a slot when a new host needs
- * to show them.
- */
-enum class FeatureSlot {
-    /** The Settings screen. */
-    SETTINGS,
-    // e.g. HOME, OVERFLOW_MENU, …
-}
-
-/**
- * Identifies one of the app's non-common (store-specific) features. A host surface uses this to
- * decide how/where to present the action — e.g. Settings renders [REBATE] as a card at the top and
- * [PASSWORD_RESET] as a button before "Log out". Add a value when a new optional feature exposes an
- * action.
- */
-enum class FeatureKind {
-    REBATE,
-    PASSWORD_RESET,
-}
+// FeatureSlot and FeatureKind are defined in commonMain (IosFeatureAction.kt) so iOS can share
+// the same enums without pulling in Nav3. Android sees them through commonMain → androidMain
+// visibility; this file only needs to define the NavKey-carrying FeatureAction class.
 
 /**
  * An optional, store-gated entry point a feature exposes into a shared host surface, contributed via

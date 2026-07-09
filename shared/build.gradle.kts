@@ -24,6 +24,8 @@ kotlin {
             storeFeatures.forEach { export(project(":features:$it:api")) }
             // ExperienceSnapshot + hasCapability so the iOS (SwiftUI) CapabilityGate can use them.
             export(project(":core:experience:api"))
+            // IosFeatureAction / FeatureSlot / FeatureKind — the multibinding types Swift reads.
+            export(project(":core:navigation:api"))
         }
     }
 
@@ -46,6 +48,7 @@ kotlin {
             implementation(project(":core:di:api"))
             implementation(project(":core:model:api"))
             api(project(":core:experience:api")) // exported (ExperienceSnapshot + permission helpers)
+            api(project(":core:navigation:api"))  // exported (IosFeatureAction / FeatureSlot / FeatureKind)
             implementation(project(":core:session:api"))
             storeFeatures.forEach {
                 api(project(":features:$it:api"))            // contracts (exported)
@@ -54,9 +57,9 @@ kotlin {
         }
         // The iOS DI graph declares an invoices accessor only when this store ships invoices.
         // (Same store-aware idea as the Android flavor source sets, driven by -Pstore.)
-//        val iosGraphDir = if ("invoices" in storeFeatures) "src/iosStoreWithInvoices/kotlin"
-//                          else "src/iosStoreBase/kotlin"
-//        iosMain { kotlin.srcDir(iosGraphDir) }
+        val iosGraphDir = if ("invoices" in storeFeatures) "src/iosStoreWithInvoices/kotlin"
+                          else "src/iosStoreBase/kotlin"
+        iosMain { kotlin.srcDir(iosGraphDir) }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }

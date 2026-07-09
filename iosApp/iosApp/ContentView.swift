@@ -73,8 +73,13 @@ struct MainTabView: View {
             InvoicesView(repository: appGraph.invoiceRepository)
                 .tabItem { Label("Invoices", systemImage: "doc.text") }
             #endif
-            SettingsView(repository: appGraph.settingsRepository, userEmail: userEmail, onLogout: onLogout)
-                .tabItem { Label("Settings", systemImage: "gear") }
+            SettingsView(
+                repository: appGraph.settingsRepository,
+                featureActions: appGraph.featureActions,
+                userEmail: userEmail,
+                onLogout: onLogout
+            )
+            .tabItem { Label("Settings", systemImage: "gear") }
         }
     }
 }
@@ -171,11 +176,23 @@ private func statusColor(_ status: InvoiceStatus) -> Color {
 
 struct SettingsView: View {
     let repository: SettingsRepository
+    /// The DI-contributed feature actions for this store (bridged from Kotlin `NSSet<IosFeatureAction>`).
+    /// Passed from the graph so `SettingsView` never hard-codes which optional features exist —
+    /// the set is empty in stores that ship no contributing feature.
+    let featureActions: Set<IosFeatureAction>
     let userEmail: String
     let onLogout: () -> Void
 
     @State private var darkMode = false
     @State private var notifications = true
+
+    /// Actions targeting the Settings slot, sorted by their declared order.
+    /// `order` is `Int32` (bridged from Kotlin `int32_t`), directly `Comparable` in Swift.
+    private var settingsActions: [IosFeatureAction] {
+        featureActions
+            .filter { $0.slot == FeatureSlot.settings }
+            .sorted { $0.order < $1.order }
+    }
 
     var body: some View {
         NavigationView {
@@ -187,6 +204,17 @@ struct SettingsView: View {
                 Section {
                     Toggle("Dark mode", isOn: $darkMode)
                     Toggle("Notifications", isOn: $notifications)
+                }
+                // Store-gated feature actions — contributed via DI multibinding from `:real`
+                // modules; section is absent in stores that ship no contributing feature.
+                if !settingsActions.isEmpty {
+                    Section("Features") {
+                        ForEach(settingsActions, id: \.label) { action in
+                            NavigationLink(action.label) {
+                                featureDestination(for: action)
+                            }
+                        }
+                    }
                 }
                 Section {
                     Button("Log out", action: onLogout).foregroundColor(.red)
@@ -200,6 +228,71 @@ struct SettingsView: View {
             .onChange(of: darkMode) { value in repository.darkMode = value }
             .onChange(of: notifications) { value in repository.notifications = value }
         }
+    }
+
+    /// Route each action kind to its destination view. Kotlin enums bridge as ObjC reference types,
+    /// so compare with `==` (pointer/isEqual:) rather than Swift pattern matching.
+    @ViewBuilder
+    private func featureDestination(for action: IosFeatureAction) -> some View {
+        if action.kind == FeatureKind.rebate {
+            RebateView()
+        } else if action.kind == FeatureKind.passwordReset {
+            PasswordResetView()
+        } else {
+            Text(action.label)
+        }
+    }
+}
+
+// MARK: - Rebate (store-gated: storeA + storeB)
+// Pushed via NavigationLink from SettingsView, so no nested NavigationView here.
+
+struct RebateView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "percent")
+                .font(.system(size: 48))
+                .foregroundColor(.accentColor)
+            Text("Your Rebates")
+                .font(.title2)
+                .fontWeight(.semibold)
+            Text("Rebate details will appear here once the backend is wired.")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        }
+        .navigationTitle("Rebates")
+    }
+}
+
+// MARK: - Password Reset (store-gated: storeA)
+// Pushed via NavigationLink from SettingsView, so no nested NavigationView here.
+
+struct PasswordResetView: View {
+    @State private var email = ""
+    @State private var submitted = false
+
+    var body: some View {
+        Form {
+            Section(header: Text("Account email")) {
+                TextField("Email", text: $email)
+                    .keyboardType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+            }
+            Section {
+                Button("Send reset link") { submitted = true }
+                    .disabled(email.isEmpty)
+            }
+            if submitted {
+                Section {
+                    Text("If an account exists for \(email), a reset link has been sent.")
+                        .foregroundColor(.secondary)
+                        .font(.footnote)
+                }
+            }
+        }
+        .navigationTitle("Reset Password")
     }
 }
 
