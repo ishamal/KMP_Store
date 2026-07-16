@@ -1,7 +1,7 @@
 package com.isharaw.kmpproj.feature.login.real
 
 import com.isharaw.kmpproj.core.AppScope
-import com.isharaw.kmpproj.core.ExperienceResolver
+import com.isharaw.kmpproj.core.ExperienceProvider
 import com.isharaw.kmpproj.core.Session
 import com.isharaw.kmpproj.feature.login.Authenticator
 import com.isharaw.kmpproj.feature.login.LoginValidator
@@ -22,7 +22,7 @@ class RealLoginValidator : LoginValidator {
 @Inject
 @ContributesBinding(AppScope::class)
 class RealAuthenticator(
-    private val experienceResolver: ExperienceResolver,
+    private val experienceProvider: ExperienceProvider,
 ) : Authenticator {
 
     // A successful login yields the business unit, role and capability list ([StubLoginData] stands in
@@ -35,12 +35,12 @@ class RealAuthenticator(
         val capabilities = StubLoginData.capabilitiesFor(businessUnit)
         val permitionList = StubLoginData.permitionListFor(businessUnit)
 
-        val snapshot = experienceResolver.getExperienceSnapshot(
+        val snapshot = experienceProvider.getExperienceSnapshot(
             experience = StubLoginData.experience,
             businessUnit = businessUnit,
-            userRole = userRole,
+            userRoles = userRole,
             capabilities = capabilities,
-            permitionList = permitionList,
+            permission = permitionList,
         )
         return Session(email = email.trim(), snapshot = snapshot)
     }

@@ -5,7 +5,7 @@ package com.isharaw.kmpproj.core
  * [ExperienceSnapshot] without a full logout/login cycle.
  *
  * Each switch recomputes the snapshot from scratch using [StubCapabilities] for the new BU, then
- * loads it into [ExperienceReader] and updates the [LocalExperienceSnapshot] provided by the app
+ * loads it into [ExperienceProvider] and updates the [LocalExperienceSnapshot] provided by the app
  * shell. Only [PermissionGate] readers recompose — the back stack and NavDisplay
  * host are stable across switches so the user remains on whichever screen triggered the switch.
  * The [LocalSnapshotController] CompositionLocal exposes the active instance.

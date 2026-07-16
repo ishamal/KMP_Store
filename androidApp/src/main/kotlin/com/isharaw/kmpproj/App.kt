@@ -89,14 +89,14 @@ fun App() {
 
                 private fun recomputeAndLoad(experience: Experience, businessUnit: BusinessUnit) {
                     val role = currentSnapshot?.userRoles ?: return
-                    val newSnapshot = graph.experienceResolver.getExperienceSnapshot(
+                    val newSnapshot = graph.experienceProvider.getExperienceSnapshot(
                         experience = experience,
                         businessUnit = businessUnit,
-                        userRole = role,
+                        userRoles = role,
                         capabilities = StubCapabilities.capabilitiesFor(businessUnit),
-                        permitionList = StubCapabilities.permissionListFor(businessUnit),
+                        permission = StubCapabilities.permissionListFor(businessUnit),
                     )
-                    graph.experienceReader.load(newSnapshot)
+                    graph.experienceProvider.load(newSnapshot)
                     currentSnapshot = newSnapshot
                 }
             }
@@ -127,12 +127,12 @@ fun App() {
             LocalSnapshotController provides snapshotController,
             LocalFeatureActions provides graph.featureActions,
         ) {
-            // Keep the app-scoped reader in sync with the session on login/logout. The reader is
+            // Keep the app-scoped provider in sync with the session on login/logout. The provider is
             // also updated on every BU/experience switch via recomputeAndLoad above.
             remember(session) {
                 val current = session
-                if (current != null) graph.experienceReader.load(current.snapshot)
-                else graph.experienceReader.clear()
+                if (current != null) graph.experienceProvider.load(current.snapshot)
+                else graph.experienceProvider.clear()
             }
 
             if (session == null) {

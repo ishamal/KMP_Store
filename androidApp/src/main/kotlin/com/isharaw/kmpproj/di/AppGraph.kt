@@ -3,8 +3,7 @@ package com.isharaw.kmpproj.di
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.EntryProviderInstaller
 import com.isharaw.kmpproj.core.ExperienceBusinessUnitDefaults
-import com.isharaw.kmpproj.core.ExperienceReader
-import com.isharaw.kmpproj.core.ExperienceResolver
+import com.isharaw.kmpproj.core.ExperienceProvider
 import com.isharaw.kmpproj.core.FeatureAction
 import com.isharaw.kmpproj.core.SessionManager
 import com.isharaw.kmpproj.core.Tab
@@ -39,11 +38,9 @@ interface AppGraph : ViewModelGraph {
     val authenticator: Authenticator
     val sessionManager: SessionManager
 
-    // App-scoped experience reader; the shell loads its snapshot when home loads, clears it on logout.
-    val experienceReader: ExperienceReader
-
-    // Builds an ExperienceSnapshot from login/BU-switch inputs; exposed for the BU switcher in App.kt.
-    val experienceResolver: ExperienceResolver
+    // App-scoped experience provider: builds ExperienceSnapshots (login/BU-switch inputs) and holds
+    // the live one — the shell loads it when home loads, clears it on logout.
+    val experienceProvider: ExperienceProvider
 
     // Per-store default BU per experience (from the build-logic STORES table → BuildConfig).
     val experienceBusinessUnitDefaults: ExperienceBusinessUnitDefaults

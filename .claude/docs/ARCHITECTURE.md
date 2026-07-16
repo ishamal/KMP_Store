@@ -3,7 +3,7 @@ entry: androidApp — MainActivity.kt → App.kt (Compose root). App.kt creates 
 dirs:
   - core/<name>/{api,real}: api = interfaces + pure types; real = implementations + Compose UI + Metro bindings. Modules: di, model, experience, session, navigation, ui.
     - core/model: domain types; re-exports core/experience (Experience, BusinessUnit, UserRole, Feature, ExperienceSnapshot).
-    - core/experience: ExperienceSnapshot (access model) + ExperienceResolver (builds snapshot at login) + ExperienceReader (app-scoped set-later holder; load() on home, clear() on logout).
+    - core/experience: ExperienceSnapshot (access model) + ExperienceProvider (builds the snapshot at login AND holds the live one app-scoped, StateFlow-backed; load() on home, clear() on logout; snapshotFlow for reactive observers).
     - core/ui: shared Android Compose helpers (FeatureGate, CapabilityGate, formatPrice) + branding theme (BrandColorScheme, LocalBrandColorScheme, AppTheme, ExperienceController). Avoids the compose-MPP plugin; depends on compose.ui for Color.
   - features/<name>/{api,real}: login, cart, invoices, settings, orders, rebate, passwordReset (+ features/test). Each :real registers tabs/nav entries + Metro bindings; flavors link only the :real modules their store lists.
   - androidApp/src/main: App shell + branding values (src/main/kotlin/.../branding/: per-brand color files KeelsColors/CargillsColors/GlomarkColors + BrandPalette mappers). src/<store>/ = flavor source sets (FlavorDefaults.kt pins the default Experience; res/values/strings.xml holds the launcher app_name only).

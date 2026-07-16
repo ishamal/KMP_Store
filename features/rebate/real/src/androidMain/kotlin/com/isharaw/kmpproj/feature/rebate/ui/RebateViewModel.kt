@@ -5,7 +5,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import com.isharaw.kmpproj.core.AppScope
 import com.isharaw.kmpproj.core.Capability
-import com.isharaw.kmpproj.core.ExperienceReader
+import com.isharaw.kmpproj.core.ExperienceProvider
 import com.isharaw.kmpproj.core.FeatureId
 import com.isharaw.kmpproj.feature.rebate.RebateRepository
 import dev.zacsweers.metro.ContributesIntoMap
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.Flow
 @ViewModelKey(RebateViewModel::class)
 class RebateViewModel(
     private val repository: RebateRepository,
-    private val experience: ExperienceReader,
+    private val experience: ExperienceProvider,
 ) : MoleculeViewModel<RebateEvent, RebateState>() {
 
     @Composable

@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// :core:experience:real — RealExperienceResolver (builds the snapshot at login) and
-// RealExperienceReader (app-scoped set-later holder for the snapshot + queries). Applies Metro.
+// :core:experience:real — RealExperienceProvider (builds the snapshot at login + app-scoped
+// StateFlow-backed holder for the live snapshot + queries). Applies Metro.
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
