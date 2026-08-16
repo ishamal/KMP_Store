@@ -25,7 +25,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":core:experience:api"))
-            implementation(project(":core:di:api")) // AppScope, CustomerScope
+            implementation(project(":core:di:api")) // AppScope, ExperienceScope
+            implementation(libs.metrox.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

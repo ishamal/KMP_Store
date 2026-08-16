@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation3.runtime.NavKey
 import com.isharaw.kmpproj.branding.FlavorDefaults
 import com.isharaw.kmpproj.branding.brandColorsFor
@@ -44,6 +45,10 @@ fun App() {
     // Observable session (RealSessionManager is Compose-backed): null → login, else → app.
     val session = graph.sessionManager.session
 
+    // Activity-level ViewModelStoreOwner — used to clear stale VMs on login/logout/BU-switch.
+    // Must be captured here (in Composition) before any clear() calls in click handlers.
+    val viewModelStoreOwner = LocalViewModelStoreOwner.current
+
     // --- Single source of truth: the live snapshot ----------------------------------------
     // Reset to the session's snapshot whenever the session changes (login → new snapshot,
     // logout → null). Runtime BU/experience switches also update this var through the
@@ -53,6 +58,13 @@ fun App() {
     // currentExperience is DERIVED from the snapshot. This ensures a BU switch (which recomputes
     // the snapshot with a different experience) always keeps colors and gating in sync.
     val currentExperience = currentSnapshot?.experience ?: FlavorDefaults.defaultExperience
+
+    // --- ExperienceScope graph extension --------------------------------------------------
+    // Recreated whenever currentSnapshot changes (login, BU/experience switch, logout→null).
+    // Non-null only while a snapshot exists (i.e. when the user is logged in).
+    val experienceGraph = remember(currentSnapshot) {
+        currentSnapshot?.let { graph.experienceGraphFactory.createExperienceGraph(it) }
+    }
 
     // --- SnapshotController: one recompute path for both experience and BU switches ----------
     // Created once per session; captures graph (stable) and reads/writes currentSnapshot lazily
@@ -96,7 +108,10 @@ fun App() {
                         capabilities = StubCapabilities.capabilitiesFor(businessUnit),
                         permission = StubCapabilities.permissionListFor(businessUnit),
                     )
-                    graph.experienceProvider.load(newSnapshot)
+                    // Clear stale VMs before the snapshot swaps so children always see fresh ones.
+                    // This runs in an onClick handler (before the next recomposition), so it
+                    // executes before any metroViewModel() call reads the store.
+                    viewModelStoreOwner?.viewModelStore?.clear()
                     currentSnapshot = newSnapshot
                 }
             }
@@ -120,19 +135,21 @@ fun App() {
     val colorScheme = colorSchemeFor(currentExperience)
     MaterialTheme(colorScheme = colorScheme) {
         CompositionLocalProvider(
-            LocalMetroViewModelFactory provides graph.metroViewModelFactory,
+            // Post-login: use the ExperienceScope factory (contains snapshot-scoped VMs).
+            // Pre-login: fall back to the app-scoped factory.
+            LocalMetroViewModelFactory provides (experienceGraph?.viewModelFactory
+                ?: graph.metroViewModelFactory),
             LocalBrandColorScheme provides brandColorsFor(currentExperience),
             LocalExperienceController provides experienceController,
             LocalExperienceSnapshot provides currentSnapshot,
             LocalSnapshotController provides snapshotController,
             LocalFeatureActions provides graph.featureActions,
         ) {
-            // Keep the app-scoped provider in sync with the session on login/logout. The provider is
-            // also updated on every BU/experience switch via recomputeAndLoad above.
+            // Clear ViewModelStore on login (new session) and logout (null session). Runs in the
+            // composition body (before children compose), so VMs are always recreated against the
+            // current ExperienceScope factory rather than re-using stale instances.
             remember(session) {
-                val current = session
-                if (current != null) graph.experienceProvider.load(current.snapshot)
-                else graph.experienceProvider.clear()
+                viewModelStoreOwner?.viewModelStore?.clear()
             }
 
             if (session == null) {

@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// :core:experience — the access SNAPSHOT model the backend resolves at login:
+// :core:experience:api — the access SNAPSHOT model the backend resolves at login:
 // Experience, BusinessUnit, UserRole, Feature, ExperienceSnapshot, ExperienceProvider.
-// Pure types + coroutines (StateFlow in ExperienceProvider), no Compose.
+// Pure types only; no Compose, no coroutines (StateFlow was removed with the nullable holder).
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
@@ -23,10 +23,6 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            // StateFlow is part of the ExperienceProvider surface, so consumers need it too.
-            api(libs.kotlinx.coroutines.core)
-        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }

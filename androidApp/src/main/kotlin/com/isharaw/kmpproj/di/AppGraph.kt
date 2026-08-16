@@ -7,6 +7,7 @@ import com.isharaw.kmpproj.core.ExperienceProvider
 import com.isharaw.kmpproj.core.FeatureAction
 import com.isharaw.kmpproj.core.SessionManager
 import com.isharaw.kmpproj.core.Tab
+import com.isharaw.kmpproj.core.experience.real.ExperienceGraph
 import com.isharaw.kmpproj.feature.login.Authenticator
 import com.isharaw.kmpproj.feature.login.LoginValidator
 import dev.zacsweers.metro.DependencyGraph
@@ -38,12 +39,15 @@ interface AppGraph : ViewModelGraph {
     val authenticator: Authenticator
     val sessionManager: SessionManager
 
-    // App-scoped experience provider: builds ExperienceSnapshots (login/BU-switch inputs) and holds
-    // the live one — the shell loads it when home loads, clears it on logout.
+    // Pure snapshot builder — builds ExperienceSnapshots from login/BU-switch inputs.
+    // The live snapshot lives in ExperienceGraph (ExperienceScope), not here.
     val experienceProvider: ExperienceProvider
 
     // Per-store default BU per experience (from the build-logic STORES table → BuildConfig).
     val experienceBusinessUnitDefaults: ExperienceBusinessUnitDefaults
+
+    // Factory for the ExperienceScope graph extension; created once per snapshot (login/BU switch).
+    val experienceGraphFactory: ExperienceGraph.Factory
 }
 
 fun createAppGraph(): AppGraph = createGraph<AppGraph>()

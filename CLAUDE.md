@@ -20,6 +20,6 @@ sessions:_lean_dev_sessions/
 - `androidApp/src/main/kotlin/.../App.kt` — Compose root, session routing, theme + experience wiring.
 - `androidApp/src/main/kotlin/.../branding/` — `BrandPalette.kt` (`brandColorsFor`/`colorSchemeFor`) + per-brand `*Colors.kt`.
 - `core/ui/.../BrandColorScheme.kt`, `AppTheme.kt`, `ExperienceController.kt` — theming types/accessors.
-- `core/experience/.../ExperienceSnapshot.kt` — access model (features/capabilities); `ExperienceProvider`/`RealExperienceProvider` (builds + holds the live snapshot, StateFlow-backed).
+- `core/experience/.../ExperienceSnapshot.kt` — access model (features/capabilities); `ExperienceProvider`/`RealExperienceProvider` is now the **pure snapshot builder** only. The live snapshot is bound non-null in `ExperienceGraph` (`@GraphExtension(ExperienceScope::class)` in `core/experience/real`), recreated per BU/experience switch and dropped at logout; snapshot-consuming VMs contribute into `ExperienceScope`.
 - `build-logic/` — included build with the `store-catalog`/`store-features` convention plugins; `Stores.kt` (`STORES` table) is the flavor & feature source of truth (replaced the old `buildSrc/StoreManifest.kt` + `config/stores/*.properties`).
 - `features/login/real/.../StubLoginData.kt` — stubbed backend/auth.
